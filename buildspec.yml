@@ -5,30 +5,16 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      # Force clean npm cache to avoid corrupted cache
-      - npm cache clean --force
-      # Optional: Add a delay to ensure cache clean completes
-      - sleep 10
-      # Update npm to the latest stable version
-      - npm install -f
-      # Install dependencies with verbose logging for debugging
-      - npm install --verbose
-
+      - echo Installing dependencies
+      - npm install
   build:
     commands:
-      # Run the build script
-      - npm run-script build
-
+      - echo Building the React app
+      - npm run build
+  post_build:
+    commands:
+      - echo Preparing for deployment
+      - zip -r react-app.zip build appspec.yml scripts/
 artifacts:
-  # Include all files required to run the application
   files:
-    - public/**/*
-    - src/**/*
-    - package.json
-    - package-lock.json
-    - index.js
-    - appspec.yml
-    - scripts/**/*
-  discard-paths: yes
-  exclude:
-    - node_modules/**/*
+    - react-app.zip
