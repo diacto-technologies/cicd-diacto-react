@@ -5,12 +5,14 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      # Clean npm cache to avoid corrupted packages
+      # Force clean npm cache to avoid corrupted cache
       - npm cache clean --force
-      # Install dependencies
-      - npm install
-      # Install necessary dev dependencies
-      - npm install --save-dev @babel/plugin-proposal-private-property-in-object
+      # Optional: Add a delay to ensure cache clean completes
+      - sleep 10
+      # Update npm to the latest stable version
+      - npm install -g npm@latest
+      # Install dependencies with verbose logging for debugging
+      - npm install --verbose
 
   build:
     commands:
@@ -19,16 +21,14 @@ phases:
 
 artifacts:
   # Include all files required to run the application
-  # Notably excluded is node_modules, as this will cause overwrite error on deploy
   files:
     - public/**/*
     - src/**/*
     - package.json
+    - package-lock.json
     - index.js
     - appspec.yml
     - scripts/**/*
-
-  # Exclude node_modules directory to avoid conflicts
   discard-paths: yes
   exclude:
     - node_modules/**/*
