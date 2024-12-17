@@ -5,11 +5,21 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
+      # Display Node.js and npm versions
+      - node -v
+      - npm -v
+
       # Clear npm cache to prevent corrupt tarball issues
       - npm cache clean --force
-      
-      # Install dependencies
-      - npm install
+
+      # Remove existing dependencies to ensure a clean slate
+      - rm -rf node_modules package-lock.json
+
+      # Set npm registry explicitly
+      - npm set registry https://registry.npmjs.org/
+
+      # Install dependencies with verbose logging
+      - npm install --verbose
 
   build:
     commands:
