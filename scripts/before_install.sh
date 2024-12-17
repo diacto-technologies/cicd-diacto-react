@@ -4,7 +4,7 @@
 cd /home/ubuntu/ditacto
 
 # Update Package Index
-sudo apt-get update
+sudo apt-get update -y
 
 # Remove any existing Node.js/npm to avoid conflicts
 sudo apt-get remove --purge -y nodejs npm
@@ -17,4 +17,5 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # Install PM2 globally
-sudo npm install pm2 -g
+sudo npm install -g pm2
+
