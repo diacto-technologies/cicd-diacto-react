@@ -8,7 +8,7 @@ phases:
     commands:
         # install npm
         - npm install
-        - npm install --save-dev @babel/plugin-proposal-private-property-in-object
+        # npm install --save-dev @babel/plugin-proposal-private-property-in-object
         
        
   build:
