@@ -11,7 +11,7 @@ sudo apt-get remove --purge -y nodejs npm
 sudo apt-get autoremove -y
 
 # Add Node.js 20.x Repository
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 
 # Install Node.js
 sudo apt-get install -y nodejs
