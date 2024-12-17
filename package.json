@@ -1,6 +1,8 @@
+
 {
   "name": "candidhr-frontend",
   "version": "0.1.0",
+  "proxy" : "http://127.0.0.1:8000/",
   "private": true,
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
@@ -32,11 +34,13 @@
     "react-xarrows": "^2.0.2",
     "tabulator-tables": "^5.5.3",
     "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+ "express": "^4.18.2", 
+    "path": "^0.12.7"  
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+     "build": "react-scripts build",
+   "start": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
