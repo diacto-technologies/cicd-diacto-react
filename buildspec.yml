@@ -3,23 +3,25 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 20  # Ensure Node.js v20.x.x is used, as 20.17.x is included in this version series
+      nodejs: 18
+   
     commands:
-      - echo Installing project dependencies...
-      - npm install  # Install dependencies from package.json
-
+        # install npm
+        - npm install
+      
+       
   build:
     commands:
-      - echo Building the React app...
-      - npm run build  # Build the React app (ensure `build` is defined in package.json)
-
-  post_build:
-    commands:
-      - echo Packaging build artifacts...
-      - mkdir -p build-artifacts  # Create a directory to store the build output
-      - cp -r build/* build-artifacts/  # Copy build files to the artifacts directory
-      - echo Build artifacts prepared successfully
-
+        # run build script
+        - npm run build
+     
 artifacts:
+  # include all files required to run application
+  # notably excluded is node_modules, as this will cause overwrite error on deploy
   files:
-    - build-artifacts/**/*  # Specify the files to be uploaded as build artifacts
+    - public/**/*
+    - src/**/*
+    - package.json
+    - index.js
+    - appspec.yml
+    - scripts/**/*
