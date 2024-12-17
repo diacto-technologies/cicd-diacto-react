@@ -6,7 +6,7 @@ phases:
       nodejs: 20
     commands:
       - echo Installing dependencies
-      - npm install
+      - npm install -g npm
   build:
     commands:
       - echo Building the React app
