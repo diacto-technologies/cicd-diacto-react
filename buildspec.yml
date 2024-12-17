@@ -4,20 +4,22 @@ phases:
   install:
     runtime-versions:
       nodejs: 20
-   
     commands:
-        # install npm
-        - npm install
-        - npm install --save-dev @babel/plugin-proposal-private-property-in-object
-       
+      # Clean npm cache to avoid corrupted packages
+      - npm cache clean --force
+      # Install dependencies
+      - npm install
+      # Install necessary dev dependencies
+      - npm install --save-dev @babel/plugin-proposal-private-property-in-object
+
   build:
     commands:
-        # run build script
-        - npm run-script build
-     
+      # Run the build script
+      - npm run-script build
+
 artifacts:
-  # include all files required to run application
-  # notably excluded is node_modules, as this will cause overwrite error on deploy
+  # Include all files required to run the application
+  # Notably excluded is node_modules, as this will cause overwrite error on deploy
   files:
     - public/**/*
     - src/**/*
@@ -25,3 +27,8 @@ artifacts:
     - index.js
     - appspec.yml
     - scripts/**/*
+
+  # Exclude node_modules directory to avoid conflicts
+  discard-paths: yes
+  exclude:
+    - node_modules/**/*
