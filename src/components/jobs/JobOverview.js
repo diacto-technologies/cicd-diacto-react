@@ -5,7 +5,6 @@ import '../../utils/react-quill/Toolbar.css'
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { api } from "../../constants/constants";
 
 const JobOverview = () => {
     const { user, authTokens, logoutUser } = useContext(AuthContext);
@@ -25,7 +24,7 @@ const JobOverview = () => {
         //console.log("fetching dataset")
         try {
             setLoading(true)
-            const response = await fetch(`${api}/jobs/job-detail/${jobId}/`,
+            const response = await fetch(`/jobs/job-detail/${jobId}/`,
                 {
                     method: "GET",
                     headers: {

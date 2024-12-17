@@ -2,7 +2,6 @@ import { useContext, useEffect, useRef, useState } from "react";
 import "./Profile.css"
 import AuthContext from "../../context/AuthContext";
 import { ChevronDownIcon, EnvelopeIcon, IdentificationIcon, LinkIcon, MapPinIcon, PencilIcon, PencilSquareIcon, PhoneIcon, PhotoIcon, PlusIcon, ShieldCheckIcon, SparklesIcon, UserIcon, UsersIcon, XMarkIcon } from '@heroicons/react/20/solid'
-import { api } from "../../constants/constants";
 
 const Profile = () => {
 
@@ -61,9 +60,13 @@ const Profile = () => {
         });
     };
 
+    // console.log(formData)
+    // console.log(userDetails ? true : false)
+
 
     const handleProfilePicChange = async (event) => {
         // setProfilePic(event.target.files[0]);
+        console.log(event.target.files[0])
         if (event.target.files[0]) {
             setLoadingPic(true)
             const imageUrl = URL.createObjectURL(event.target.files[0]);
@@ -73,7 +76,7 @@ const Profile = () => {
                 const picFormData = new FormData(); // Create a FormData object for file upload
                 picFormData.append('profile_pic', event.target.files[0]);
 
-                const response = await fetch(`${api}/accounts/users/${formData.id}/`,
+                const response = await fetch(`/accounts/users/${formData.id}/`,
                     {
                         method: 'PATCH',
                         headers: {
@@ -119,7 +122,7 @@ const Profile = () => {
 
     const getProfileKPIData = async () => {
         try {
-            const response = await fetch(`${api}/accounts/profile-kpi/`, {
+            const response = await fetch(`/accounts/profile-kpi/`, {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: "Bearer " + String(authTokens.access),
@@ -129,6 +132,7 @@ const Profile = () => {
             const data = await response.json();
 
             if (response.ok) {
+                console.log(data)
                 const newKpiMetrics = { ...kpiMetrics }
 
                 newKpiMetrics.total_jobs.value = data.total_jobs
@@ -149,8 +153,9 @@ const Profile = () => {
 
     const handleSaveField = async (field) => {
         try {
+            console.log(field)
             const body = { [field]: formData[field] }
-            const response = await fetch(`${api}/accounts/users/${formData.id}/`,
+            const response = await fetch(`/accounts/users/${formData.id}/`,
                 {
                     method: 'PATCH',
                     headers: {
@@ -164,6 +169,7 @@ const Profile = () => {
             const data = await response.json()
 
             if (response.ok) {
+                console.log(response, data)
                 setEditElementId(null)
             }
             else {

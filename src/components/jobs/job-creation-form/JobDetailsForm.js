@@ -1,7 +1,7 @@
 import CreatableSelect from "react-select/creatable";
 import CustomToolbar from "../../../utils/react-quill/CustomToolbar";
 import "../../../utils/react-quill/Toolbar.css";
-import { api, selectStyle, selectTheme } from "../../../constants/constants";
+import { selectStyle, selectTheme } from "../../../constants/constants";
 import AuthContext from "../../../context/AuthContext";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -92,7 +92,6 @@ function JobDetailsForm({
     const [newJobId, setNewJobId] = useState(null);
     const [aiDescLoading, setAiDescLoading] = useState(false);
     const [saveDisabled, setSaveDisabled] = useState(false);
-    const [showUserPrompt, setShowUserPrompt] = useState(false);
     const currentDate = new Date().toISOString().split("T")[0];
     const navigate = useNavigate();
     const modules = {
@@ -134,7 +133,6 @@ function JobDetailsForm({
         new_applicant_notify: false,
         location: null,
         owner: user.id,
-        user_prompt: ""
     });
 
     const [weights, setWeights] = useState({
@@ -162,7 +160,7 @@ function JobDetailsForm({
         setLoading(true);
         //console.log("fetching dataset")
         try {
-            const response = await fetch(`${api}/jobs/job/${jobId}/`, {
+            const response = await fetch(`/jobs/job/${jobId}/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -219,12 +217,12 @@ function JobDetailsForm({
         };
         formData.score_weight = JSON.stringify(format_weights);
 
-        const jobFormUrl = jobId ? `${api}/jobs/job/${jobId}/` : `${api}/jobs/job/`;
+        const jobFormUrl = jobId ? `/jobs/job/${jobId}/` : `/jobs/job/`;
         if (
             weights.total === 10 &&
             formData.title &&
             formData.description &&
-            (formData.min_experience !== null || formData.min_experience !== '') &&
+            (formData.min_experience !== null || formData.min_experience !== '')  &&
             formData.max_experience &&
             formData.employment_type &&
             formData.location &&
@@ -335,10 +333,10 @@ function JobDetailsForm({
         navigate(`/app/user/jobs/edit-job/${jobId}/${stepId}/`);
     };
 
-    const handleNext = () => {
-        if (jobId) navigateToStep(currentStep + 1)
-        else navigateToJobStep(newJobId, currentStep + 1)
-    }
+  const handleNext = () => {
+      if (jobId) navigateToStep(currentStep + 1)
+      else navigateToJobStep(newJobId, currentStep + 1)
+  }
 
     const generateJobDescription = async () => {
         const payload = {
@@ -354,14 +352,12 @@ function JobDetailsForm({
             payload["min_experience"] = formData?.min_experience;
         if (formData?.max_experience)
             payload["max_experience"] = formData?.max_experience;
-        if (formData?.user_prompt)
-            payload["user_prompt"] = formData?.user_prompt;
 
         try {
             if (formData.title) {
                 setAiDescLoading(true);
                 setError(null);
-                const response = await fetch(`${api}/jobs/generate-job-description/`, {
+                const response = await fetch(`/jobs/generate-job-description/`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -403,16 +399,13 @@ function JobDetailsForm({
         const payload = {
             job_title: formData?.title,
             job_description: formData?.description || formData.jd_html,
-        };
-
-        if (formData?.user_prompt)
-            payload["user_prompt"] = formData?.user_prompt;
-
+        }; 
+ 
         try {
             if (formData.title && formData.description) {
                 setAiDescLoading(true);
                 setError(null);
-                const response = await fetch(`${api}/jobs/rewrite-job-description/`, {
+                const response = await fetch(`/jobs/rewrite-job-description/`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -448,17 +441,6 @@ function JobDetailsForm({
             setError(error);
         }
     }
-
-    // const toggleUserPrompt = () => {
-    //     if (showUserPrompt) {
-    //         setShowUserPrompt(false)
-    //         setFormData(prev => ({
-    //             ...prev,
-    //             user_prompt: ""
-    //         }))
-    //     }
-    //     else setShowUserPrompt(true)
-    // }
 
 
     return (
@@ -523,6 +505,55 @@ function JobDetailsForm({
                                 autoComplete="location"
                                 className="border-2 rounded-md w-full h-12 px-5"
                             ></input>
+                        </div>
+                        <div className="mt-8">
+                            <div className="flex justify-between items-center mb-2">
+                                <h2 className="mb-3">
+                                    Description<span className="text-red-500">*</span>
+                                </h2>
+                                <div className="flex gap-3 items-center relative">
+                                    {/* {true && <div className="flux">
+                                        Thinking...
+                                    </div>} */}
+                                    {/* <button className='border-2 px-6 py-2 disabled:cursor-not-allowed' onClick={() => generateJobDescription()} disabled={aiDescLoading}>{formData.description.trim() ? "Rewrite using AI" : "Generate using AI"}</button> */}
+                                    {error && error.description && (
+                                        <span className="text-sm text-red-500">
+                                            {error.description}
+                                        </span>
+                                    )}
+                                    <div className="flex relative">
+                                        <GenerateButton
+                                            text={
+                                                aiDescLoading
+                                                    ? "Thinking"
+                                                    : formData?.description?.trim()
+                                                        ? "Rewrite using AI"
+                                                        : "Generate using AI"
+                                            }
+                                            isDisabled={aiDescLoading}
+                                            onClickHandler={formData?.description?.trim() ? rewriteJobDescription : generateJobDescription}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            {/* <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            className="border-2 rounded-md w-full h-48 px-5 py-3"></textarea> */}
+                            <CustomToolbar />
+                            <ReactQuill
+                                theme="snow"
+                                // value={htmlContent || text}
+                                value={formData.jd_html || formData.description}
+                                className="bg-white h-72"
+                                onChange={(content, delta, source, editor) =>
+                                    handleChange(content, delta, source, editor)
+                                }
+                                placeholder="Write a few sentences about the job role..."
+                                modules={modules}
+                                formats={formats}
+                            />
                         </div>
                         <div className="flex flex-row flex-wrap gap-12">
                             <div className="mt-8 flex-grow w-[40%]">
@@ -620,61 +651,6 @@ function JobDetailsForm({
                                 />
                             </div>
                         </div>
-                        <div className="mt-8">
-    {/* Prompt Section */}
-    <div>
-    <h2 className="mb-3">Additional Prompt to generate job description</h2>
-       
-            <textarea
-                name="user_prompt"
-                value={formData.user_prompt}
-                onChange={handleInputChange}
-                placeholder="- Emphasize teamwork and problem-solving skills.
-- Focus on candidates with experience in SaaS product management.
-- Highlight flexible working hours and growth opportunities."
-                className="border-2 rounded-md w-full p-3 text-sm placeholder:text-sm mb-4"
-                rows={4}
-            />
-        
-        <div className="flex justify-end items-end">
-           
-            <GenerateButton
-                text={
-                    aiDescLoading
-                        ? "Thinking"
-                        : formData?.description?.trim()
-                        ? "Rewrite using AI"
-                        : "Generate using AI"
-                }
-                isDisabled={aiDescLoading}
-                onClickHandler={formData?.description?.trim() ? rewriteJobDescription : generateJobDescription}
-            />
-        </div>
-    </div>
-
-    {/* Description Section */}
-    
-        <h2 className="text-lg font-semibold mb-4">
-            Description <span className="text-red-500">*</span>
-        </h2>
-        <div className="flex justify-between items-center mb-2">
-            {error && error.description && (
-                <span className="text-sm text-red-500">{error.description}</span>
-            )}
-        </div>
-        <CustomToolbar />
-        <ReactQuill
-            theme="snow"
-            value={formData.jd_html || formData.description}
-            className="bg-white h-72"
-            onChange={(content, delta, source, editor) => handleChange(content, delta, source, editor)}
-            placeholder="Write a few sentences about the job role..."
-            modules={modules}
-            formats={formats}
-        />
-    
-</div>
-
                         <div className="bg-gray-100 px-8 py-4 rounded-md mt-8">
                             <h2 className="font-semibold">
                                 Score Widget<span className="text-red-500">*</span>
@@ -699,30 +675,30 @@ function JobDetailsForm({
                     </h2>
                 )}
 
-                <div className="flex px-16 py-6 w-full justify-end gap-4">
-                    {currentStep !== 1 && (
-                        <button
-                            onClick={() => navigateToStep(currentStep - 1)}
-                            className="border rounded-md px-6 py-2"
-                        >
-                            Back
-                        </button>
-                    )}
-                    {currentStep !== formSteps.length && <button onClick={handleNext} disabled={!newJobId && !jobId} className="border rounded-md px-6 py-2 disabled:bg-gray-200 disabled:text-gray-400">Next</button>}
-                   
-                    {currentStep !== formSteps.length && (
-                        <button
-                            onClick={handleFormSubmit}
-                            disabled={loading || saveDisabled}
-                            className="border bg-brand-purple text-white rounded-md px-6 py-2 disabled:bg-indigo-200"
-                        >
-                            Save and Continue
-                        </button>
-                    )}
-                </div>
-            </div>
-        </>
-    );
+        <div className="flex px-16 py-6 w-full justify-end gap-4">
+          {currentStep !== 1 && (
+            <button
+              onClick={() => navigateToStep(currentStep - 1)}
+              className="border rounded-md px-6 py-2"
+            >
+              Back
+            </button>
+          )}
+          {currentStep !== formSteps.length && <button onClick={handleNext} disabled={!newJobId && !jobId} className="border rounded-md px-6 py-2 disabled:bg-gray-200 disabled:text-gray-400">Next</button>}
+          {}
+          {currentStep !== formSteps.length && (
+            <button
+              onClick={handleFormSubmit}
+              disabled={loading || saveDisabled}
+              className="border bg-brand-purple text-white rounded-md px-6 py-2 disabled:bg-indigo-200"
+            >
+              Save and Continue
+            </button>
+          )}
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default JobDetailsForm;

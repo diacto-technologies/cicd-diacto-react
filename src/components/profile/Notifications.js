@@ -2,7 +2,6 @@ import { useContext, useEffect, useRef, useState } from "react";
 import "./Profile.css"
 import AuthContext from "../../context/AuthContext";
 import ProfileNavbar from "./ProfileNavbar";
-import { api } from "../../constants/constants";
 
 const Notifications = () => {
 
@@ -77,7 +76,7 @@ const Notifications = () => {
                 const picFormData = new FormData(); // Create a FormData object for file upload
                 picFormData.append('profile_pic', event.target.files[0]);
 
-                const response = await fetch(`${api}/accounts/users/${formData.id}/`,
+                const response = await fetch(`/accounts/users/${formData.id}/`,
                     {
                         method: 'PATCH',
                         headers: {
@@ -115,7 +114,7 @@ const Notifications = () => {
 
     const getProfileKPIData = async () => {
         try {
-            const response = await fetch(`${api}/accounts/profile-kpi/`, {
+            const response = await fetch(`/accounts/profile-kpi/`, {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: "Bearer " + String(authTokens.access),
@@ -148,7 +147,7 @@ const Notifications = () => {
         try {
             console.log(field)
             const body = { [field]: formData[field] }
-            const response = await fetch(`${api}/accounts/users/${formData.id}/`,
+            const response = await fetch(`/accounts/users/${formData.id}/`,
                 {
                     method: 'PATCH',
                     headers: {
@@ -177,15 +176,21 @@ const Notifications = () => {
         <>
             {
                 userDetails &&
-                <div className="w-full flex">
+                <div className="h-screen w-full flex">
                     {/* sidebar  */}
-                    {/* <div className="w-1/6"><ProfileNavbar /></div> */}
+                    <ProfileNavbar />
 
                     {/* body  */}
-                    <div className="w-full h-full flex flex-col justify-center items-center overflow-auto"  style={{ height: 'calc(100dvh - 57px)' }}>
-                        <i className={`fa-solid fa-lock text-gray-700 w-8 text-center p-1 text-xl`}></i>
-                        <label className="text-2xl text-gray-600 mb-1">Coming Soon</label>
-                        <p className="text-gray-500">We'll notify you once this feature is rolled out.</p>
+                    <div className="h-full w-5/6 bg-gray-50 flex flex-col px-8">
+                    <div className="mt-5 font-semibold text-[28px] pb-5 border-b">
+                        Notifications
+                    </div>
+                    <div className="mt-5 text-lg font-medium">
+                        <label>
+                            Account notifications
+                        </label>
+                    </div>
+                    
                     </div>
                 </div>
             }

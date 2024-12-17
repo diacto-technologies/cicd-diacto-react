@@ -5,23 +5,14 @@
 /*     background: black; */
 }
 
-.bar{
+.bar {
     background: #52467b;
     bottom: 1px;
     height: 3px;
     width: 12px;
     margin: 0px 5px;
     border-radius: 5px;
-    animation: sound 0ms -300ms linear infinite alternate;
-}
-
-.bar2{
-    background: #52467b;
-    bottom: 1px;
-    height: 3px;
-    width: 12px;
-    margin: 0px 5px;
-    border-radius: 5px;
+    animation: sound 0ms -600ms linear infinite alternate;
 }
 
 @keyframes sound {
@@ -45,9 +36,3 @@
 .bar:nth-child(8)  { left: 99px; animation-duration: 419ms; }
 .bar:nth-child(9)  { left: 113px; animation-duration: 487ms; }
 .bar:nth-child(10) { left: 127px; animation-duration: 442ms; }
-
-.bar2:nth-child(1)  { height: 30px; }
-.bar2:nth-child(2)  { height: 80px; }
-.bar2:nth-child(3)  { height: 50px; }
-.bar2:nth-child(4)  { height: 40px; }
-.bar2:nth-child(5)  { height: 30px; }

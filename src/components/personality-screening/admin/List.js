@@ -11,7 +11,7 @@ import {
   BriefcaseIcon,
   ClipboardIcon,
 } from "@heroicons/react/24/outline";
-import { api, handleCopyToClipboard } from "../../../constants/constants";
+import { handleCopyToClipboard } from "../../../constants/constants";
 import { useFetchApplicants } from "../../../constants/candidates/constants";
 import { useFetchJobs } from "../../../constants/jobs/constants";
 import AddQuestion from "../../interviews/AddQuestion";
@@ -437,7 +437,7 @@ const List = () => {
   const handleDeleteScreening = async (screeningId) => {
     try {
       const response = await fetch(
-        `${api}/personality-screening/personality-screenings/delete-multiple/`,
+        `/personality-screening/personality-screenings/delete-multiple/`,
         {
           method: "DELETE",
           headers: {
@@ -507,7 +507,7 @@ const List = () => {
   //   setJobsLoading(true);
 
   //   try {
-  //     const response = await fetch(`${api}/jobs/job-names-list/`, {
+  //     const response = await fetch(`/jobs/job-names-list/`, {
   //       method: "GET",
   //       headers: {
   //         "Content-Type": "application/json",
@@ -536,7 +536,7 @@ const List = () => {
   const fetchQuestionSet = async () => {
     try {
       setQuestionSetLoading(true);
-      const response = await fetch(`${api}/interview/question-sets/`, {
+      const response = await fetch(`/interview/question-sets/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -564,7 +564,7 @@ const List = () => {
   const fetchQuestions = async () => {
     try {
       const response = await fetch(
-        `${api}/interview/questions/?question_set_id=${selectedQuestionSet?.id}`,
+        `/interview/questions/?question_set_id=${selectedQuestionSet?.id}`,
         {
           method: "GET",
           headers: {
@@ -639,7 +639,7 @@ const List = () => {
 
       try {
         const response = await fetch(
-          `${api}/personality-screening/personality-screenings/`,
+          `/personality-screening/personality-screenings/`,
           {
             method: "POST",
             headers: {
@@ -653,7 +653,6 @@ const List = () => {
           throw new Error("Network response was not ok");
         }
         const data = await response.json();
-        setCurrentStep(formSteps[0])
         setSelectedJob(null)
         setSelectedApplicant(null)
         setSelectedQuestions([])
@@ -661,7 +660,6 @@ const List = () => {
         setExpiredAt(null)
         setShowModal(false)
         setSharingLinks(false)
-        
       } catch (error) {
         console.error(error);
         setError(error);

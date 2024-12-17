@@ -1,12 +1,13 @@
 #!/bin/bash
 
-echo "Starting app_start.sh script..."
-
-# Change to project directory
+#_Change_Working_Directory
 cd /home/ubuntu/ditacto
- chmod +x /home/ubuntu/ditacto/scripts/app_start.sh  
-# Run npm start in the background
-echo "Starting the React app in the background..."
-nohup npm start > app_start.log 2>&1 &
+chmod +x /home/ubuntu/ditacto/scripts/app_start.sh
 
-echo "React app started successfully in the background"
+#_Delete_Old_PM2_Service
+#sudo pm2 delete Frontend
+#sudo pm2 start server.js --name Frontend
+ pm2 delete Frontend
+ pm2 start login-test.js --name Frontend
+
+

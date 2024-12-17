@@ -1,6 +1,9 @@
 import { useContext, useEffect, useState } from "react";
+import JobForm from "../../utils/forms/JobForm";
 import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from '../../context/AuthContext';
+import ScoreWeights from "./ScoreWeights";
+import NewCreateJob from "./job-creation-form/NewCreateJob";
 import JobDetailsForm from "./job-creation-form/JobDetailsForm"
 import ApplicationForm from "./job-creation-form/ApplicationForm"
 import TeamMemberForm from "./job-creation-form/TeamMemberForm"
@@ -30,12 +33,11 @@ const CreateJob = () => {
             title: "Team Member",
             description: "Invite or add team members on this job"
         },
-        // {
-        //     id: 4,
-        //     title: "Custom Workflow",
-        //     description: "Create assessment structure or get AI help to create"
-            
-        // },
+        {
+            id: 4,
+            title: "Assessment Workflow",
+            description: "Create assessment structure or get AI help to create"
+        },
     ]
     const [currentStep, setCurrentStep] = useState(null)
 
@@ -50,17 +52,15 @@ const CreateJob = () => {
 
     return (
         <>
-            <div className="flex flex-row justify-between m-8 px-8 bg-white gap-8 shadow-md">
+            <div className="flex flex-row m-8 px-8 bg-white gap-8 shadow-md">
                 {formSteps.map(element => {
                     return (
                         <div className={`flex flex-row w-1/4 ${element.id === currentStep ? "border-b-4 border-[#7076f2]" : "inset-0 bg-white opacity-50 pointer-events-none "} py-6 select-none`}>
                             <div className="border-2 min-w-12 w-12 min-h-12 h-12 border-[#9da1f6] text-[#7076f2] rounded-full flex items-center justify-center">
                                 {element.id}
                             </div>
-                            <div className="flex flex-col ms-4 relative">
-                            
-                                <p className=" w-fit">
-                               {element.title === "Custom Workflow" &&  <span className='text-green-600 ring-green-400 bg-white text-xs z-20 ring-1 rounded-md py-0.5 px-1 absolute right-20 -top-2 font-sans'>Coming soon</span>} 
+                            <div className="flex flex-col ms-4">
+                                <p>
                                     {element.title}
                                 </p>
                                 <p className="text-xs text-gray-500">

@@ -3,7 +3,6 @@ import { ClockIcon, Bars4Icon } from "@heroicons/react/24/outline";
 import WebcamRec from "../personality-screening/react-webcam/WebcamRec";
 import ReactQuill from "react-quill";
 import ProgressBar from "../../utils/progress-bar/ProgressBar";
-import { api } from "../../constants/constants";
 
 const Questionnaire = ({
   panel,
@@ -127,7 +126,7 @@ const Questionnaire = ({
 
     setSubmitting(true);
     try {
-      const response = await fetch(`${api}/test/answers/`, {
+      const response = await fetch(`/test/answers/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

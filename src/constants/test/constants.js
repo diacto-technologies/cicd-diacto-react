@@ -1,6 +1,5 @@
 import { useContext, useState } from "react";
 import AuthContext from "../../context/AuthContext";
-import { api } from "../constants";
 
 export const useFetchPreBuiltAssessments = () => {
   const { authTokens, isSuperUser } = useContext(AuthContext); // Accessing context
@@ -11,7 +10,7 @@ export const useFetchPreBuiltAssessments = () => {
   const fetchPreBuiltAssessments = async (title) => {
     try {
       setLoadingPreBuiltAssessments(true);
-      let endpoint = `${api}/test/prebuilt-assessment-list/`
+      let endpoint = `/test/prebuilt-assessment-list/`
        
 
         if (title) {
@@ -68,7 +67,7 @@ export const usePublishPreBuiltAssessment = () => {
     setPublishing(true);
     try {
       const response = await fetch(
-        `${api}/test/prebuiltassessments/${assessmentId}/`,
+        `/test/prebuiltassessments/${assessmentId}/`,
         {
           method: "PATCH",
           headers: {
@@ -109,7 +108,7 @@ export const useFetchUserOwnedAssessments = () => {
   const fetchAssessments = async (title) => {
     try {
         setLoadingAssessments(true);
-      let endpoint = `${api}/test/list/`
+      let endpoint = `/test/list/`
        
 
         if (title) {
@@ -171,7 +170,7 @@ export const useAssignAssessment = () => {
           valid_to: new Date(validTo),
           preferences: {},
         };
-        const response = await fetch(`${api}/test/share/`, {
+        const response = await fetch(`/test/share/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

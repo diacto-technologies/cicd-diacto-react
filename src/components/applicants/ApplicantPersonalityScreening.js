@@ -1,23 +1,25 @@
 import {
+  DocumentTextIcon,
+  InformationCircleIcon,
+  PaperClipIcon,
   PauseIcon,
   PlayIcon,
+  SpeakerWaveIcon,
+  VideoCameraIcon,
 } from "@heroicons/react/20/solid";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import Audio from "../../utils/audio-sample/Bhupat Jangid-PersonalityScreening-4_895a4.wav";
+import PieChart from "../../utils/charts/PieChart";
+import SlideOver from "../../utils/slide-over/SlideOver";
 import { ClockIcon } from "@heroicons/react/24/outline";
-import { api, selectStyle } from "../../constants/constants";
-import Select from "react-select";
-import AuthContext from "../../context/AuthContext";
+import MetricPie from "../../utils/charts/MetricPie";
 
-const ApplicantPersonalityScreening = ({  setStages, jobTitle, jobId }) => {
-  const { authTokens, userDetails } = useContext(AuthContext);
-  const [selectedStatus, setSelectedStatus] = useState(null);
-  const [updatingStatus, setUpdatingStatus] = useState(false);
+const ApplicantPersonalityScreening = ({ applicant, jobId }) => {
   const [answers, setAnswers] = useState([]);
   const [screeningDetails, setScreeningDetails] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const { applicantId, serviceId } = useParams();
-  const [statusText, setStatusText] = useState("Review Pending");
 
   const audioRef = useRef(null);
   const [answerMode, setAnswerMode] = useState({});
@@ -27,25 +29,6 @@ const ApplicantPersonalityScreening = ({  setStages, jobTitle, jobId }) => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(null);
 
-  const [statuses, SetStatuses] = useState([
-    {
-      label: "Shortlisted",
-      value: "shortlist",
-    },
-    {
-      label: "Not Shortlisted",
-      value: "unshortlist",
-    },
-    {
-      label: "Under Review",
-      value: "under-review",
-    },
-    {
-      label: "On Hold",
-      value: "on-hold",
-    },
-  ]);
-
   useEffect(() => {
     if (applicantId && jobId) {
       setAnswers([]);
@@ -54,12 +37,6 @@ const ApplicantPersonalityScreening = ({  setStages, jobTitle, jobId }) => {
       fetchCandidateAnswers(applicantId);
     }
   }, [applicantId, jobId]);
-
-  useEffect(() => {
-    if (selectedStatus) {
-      updateStatus(selectedStatus.label);
-    }
-  }, [selectedStatus]);
 
   useEffect(() => {
     const audio = audioRef?.current;
@@ -79,77 +56,6 @@ const ApplicantPersonalityScreening = ({  setStages, jobTitle, jobId }) => {
     };
   }, [jobId]);
 
-  async function updateStatus(status_text) {
-    setUpdatingStatus(true);
-    const testLogId = screeningDetails?.id;
-    const payload = {
-      status_text: status_text,
-      updated_by: userDetails?.id,
-      updated_at: new Date(),
-    };
-
-    if (status_text && status_text === "Shortlisted") {
-      payload["approved_by"] = userDetails?.id;
-      payload["approved_at"] = new Date();
-      payload["is_approved"] = true;
-    }
-    if (status_text && status_text === "Not Shortlisted") {
-      payload["approved_by"] = null;
-      payload["approved_at"] = null;
-      payload["is_approved"] = false;
-    }
-
-    try {
-      const response = await fetch(`${api}/personality-screening/personality-screenings/${screeningDetails?.id}/`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + String(authTokens.access),
-        },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      if (data) {
-        setStatusText(data.status_text);
-        setScreeningDetails((prev) => ({
-          ...prev,
-          status_text: data.status_text,
-          is_approved: data.is_approved,
-          approved_by: data.approved_by,
-          approved_at: data.approved_at,
-          updated_by: data.updated_by,
-          updated_at: data.updated_at,
-        }));
-        setStages((prev) =>
-          prev.map((stage) => {
-            if (stage?.key === "assessment") {
-              return {
-                ...stage,
-                completed: data["completed"] ?? false,
-                is_approved: data["is_approved"] ?? false,
-                approved_by: data["approved_by"] ?? null,
-                updated_by: data["updated_by"] ?? null,
-                updated_at: data["updated_at"] || null,
-                status_text: data["status_text"] ?? "",
-              };
-            } else {
-              return stage;
-            }
-          })
-        );
-        setUpdatingStatus(false);
-      }
-    } catch (error) {
-      console.error(error);
-      setError(error.message);
-      setUpdatingStatus(false);
-    }
-  }
-
-
   const colorMap = {
     Angry: "#d62828",
     Sad: "#eae2b7",
@@ -161,11 +67,11 @@ const ApplicantPersonalityScreening = ({  setStages, jobTitle, jobId }) => {
 
   async function fetchCandidateAnswers(applicantId) {
     // Define the URL for the API endpoint
-    const answerUrl = `${api}/interview/candidate/${applicantId}/job/${jobId}/service/${serviceId}/answers/`;
+    const answerUrl = `/interview/candidate/${applicantId}/job/${jobId}/service/${serviceId}/answers/`;
     try {
       const [answersResponse, screeningDetailsResponse] = await Promise.all([
         fetch(answerUrl),
-        fetch(`${api}/personality-screening/detail/${applicantId}/`),
+        fetch(`/personality-screening/detail/${applicantId}/`),
       ]);
 
       if (!answersResponse.ok) {
@@ -221,65 +127,13 @@ const ApplicantPersonalityScreening = ({  setStages, jobTitle, jobId }) => {
   return (
     <>
       <div className=" p-4 h-full w-full ">
-        <div className="px-2 flex justify-between items-center">
-          <div>
+        <div className="px-2 sm:px-0">
           <h3 className="mt-2 text-base font-semibold leading-7 text-gray-900">
             Automated Video Interview Analysis
           </h3>
           <p className=" max-w-2xl text-sm leading-6 text-gray-500">
             Review video, audio, transcript and insights powered by AI
           </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-                  <label
-                    className={`flex bg-blue-50 ring-1 me-3 my-2 px-3 py-1 rounded-lg font-normal
-                      ${
-                        screeningDetails?.status_text === "Under Review" &&
-                        "bg-yellow-50 text-yellow-700 ring-yellow-700/40"
-                      }
-                        ${
-                          screeningDetails?.status_text === "Shortlisted" &&
-                          "bg-green-50 text-green-700 ring-green-700/40"
-                        }
-                        ${
-                          screeningDetails?.status_text === "Not Shortlisted" &&
-                          "bg-red-50 text-red-700 ring-red-700/40"
-                        }
-                        ${
-                          screeningDetails?.status_text === "On Hold" &&
-                          "bg-orange-50 text-orange-700 ring-orange-700/40"
-                        }
-                        ${
-                          screeningDetails?.status_text === "Completed" &&
-                          "bg-green-50 text-green-700 ring-green-700/40"
-                        }
-            `}
-                  >
-                    Status :{" "}
-                    {updatingStatus ? (
-                      <span className="px-1"> Updating</span>
-                    ) : (
-                      screeningDetails?.status_text
-                    )}
-                  </label>
-                  <Select
-                    isDisabled={updatingStatus || !screeningDetails?.completed}
-                    className="w-5/6 md:w-72"
-                    styles={selectStyle}
-                    value={selectedStatus}
-                    isSearchable={false}
-                    onChange={(selectedOption) =>
-                      setSelectedStatus(selectedOption)
-                    }
-                    options={statuses}
-                    placeholder={
-                      screeningDetails?.completed
-                        ? "Mark as"
-                        : "Not Completed Yet"
-                    }
-                  />
-                </div>
         </div>
         {answers && answers.length > 0 && (
           <>

@@ -11,7 +11,7 @@ import { EyeIcon, EyeSlashIcon, PlusIcon } from "@heroicons/react/24/outline";
 import AddComment from "../../utils/comments/AddComment";
 import { maskNumber } from "../../constants/constants";
 import { Link } from "react-router-dom";
-const api = process.env.REACT_APP_API_URL
+
 const ApplicantOverview = ({ jobId, applicant, resumeDetail }) => {
   const {
     authTokens,
@@ -41,7 +41,8 @@ const ApplicantOverview = ({ jobId, applicant, resumeDetail }) => {
     try {
       setLoadingComments(true);
       //console.log(jobId);
-      const response = await fetch(`${api}/interview/feedbacks/${jobId}/${applicant.id}/`
+      const response = await fetch(
+        `/interview/feedbacks/${jobId}/${applicant.id}/`
       );
       if (!response.ok) {
         setComments([]);
@@ -125,7 +126,7 @@ const ApplicantOverview = ({ jobId, applicant, resumeDetail }) => {
 
   const handlePpfView = async (resumeId) => {
     try {
-      const response = await fetch(`${api}/candidates/download-resume/${resumeId}/`, {
+      const response = await fetch(`/candidates/download-resume/${resumeId}/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

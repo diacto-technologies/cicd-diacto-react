@@ -18,7 +18,7 @@ const AudioBubble = ({ question, index, audioURL, submitted }) => {
                             </div>
                             {submitted && <span className="mt-1.5 me-2 inline-flex text-xs text-green-600"><CheckBadgeIcon className="w-4 h-4 me-0.5" /> Submitted</span>}
                         </div>
-                        <img className="h-12 w-12 flex-none rounded-full border p-1 bg-gray-50 shadow-lg" src={DefaultImg} alt="" />
+                        <img className="h-12 w-12 flex-none rounded-full border p-1 bg-gray-50 shadow-lg" src="https://images.pexels.com/photos/1080213/pexels-photo-1080213.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" />
                     </div>
 
 

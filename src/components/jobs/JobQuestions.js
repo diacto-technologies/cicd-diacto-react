@@ -8,7 +8,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import AddQuestion from "../interviews/AddQuestion";
 import Select from "react-select";
-import { api, selectStyle } from "../../constants/constants";
+import { selectStyle } from "../../constants/constants";
 import AuthContext from "../../context/AuthContext";
 import { useFetcher, useParams } from "react-router-dom";
 import SpinLoader from "../../utils/loaders/SpinLoader";
@@ -63,7 +63,7 @@ const JobQuestions = () => {
   const fetchQuestionSet = async () => {
     try {
       setQuestionSetLoading(true);
-      const response = await fetch(`${api}/interview/question-sets/`, {
+      const response = await fetch(`/interview/question-sets/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -102,7 +102,7 @@ const JobQuestions = () => {
   const fetchPreference = async () => {
     try {
       const response = await fetch(
-        `${api}/resume_parser/resume-screening-preferences/?job_id=${jobId}`, // No trailing slash after jobId
+        `/resume_parser/resume-screening-preferences/?job_id=${jobId}`, // No trailing slash after jobId
         {
           method: "GET",
           headers: {
@@ -146,7 +146,7 @@ const JobQuestions = () => {
   const fetchQuestions = async () => {
     try {
       const response = await fetch(
-        `${api}/interview/questions/?question_set_id=${selectedQuestionSet?.id}`,
+        `/interview/questions/?question_set_id=${selectedQuestionSet?.id}`,
         {
           method: "GET",
           headers: {
@@ -233,8 +233,8 @@ const JobQuestions = () => {
 
   async function updateQuestions(updatedData) {
     const apiUrl = preference
-      ? `${api}/resume_parser/resume-screening-preferences/${preference.id}/`
-      : `${api}/resume_parser/resume-screening-preferences/`;
+      ? `/resume_parser/resume-screening-preferences/${preference.id}/`
+      : `/resume_parser/resume-screening-preferences/`;
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + String(authTokens.access),
@@ -277,7 +277,7 @@ const JobQuestions = () => {
       };
       try {
         setDeleting(true)
-          const apiUrl = `${api}/interview/questions/${questionId}/`;
+          const apiUrl = `/interview/questions/${questionId}/`;
 
           const response = await fetch(apiUrl, {
               method: 'PATCH',

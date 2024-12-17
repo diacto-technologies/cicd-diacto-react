@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../../constants/constants';
 
-function CandidateCriteriaForm({ jobId, onSubmit, criteriaResponses, setCriteriaResponses, setFormValidationResponse, criteriaErrors }) {
+function CandidateCriteriaForm({ jobId, onSubmit }) {
   const [criteriaList, setCriteriaList] = useState([]);
+  const [responses, setResponses] = useState({});
   const [loading, setLoading] = useState(true);
+
+  console.log(responses)
 
   useEffect(() => {
     async function fetchCriteria() {
       try {
-        const response = await fetch(`${api}/jobs/criteria/job/${jobId}/`);
+        const response = await fetch(`/jobs/criteria/job/${jobId}/`);
         if (!response.ok) {
           throw new Error("Failed to fetch criteria");
         }
         const data = await response.json();
         setCriteriaList(data);
 
-        // Initialize criteriaResponses with empty values
-        const initialcriteriaResponses = {};
+        // Initialize responses with empty values
+        const initialResponses = {};
         data.forEach(criterion => {
-          initialcriteriaResponses[criterion.id] = criterion.response_type === 'checkbox' ? [] : '';
+          initialResponses[criterion.id] = criterion.response_type === 'checkbox' ? [] : '';
         });
-        setCriteriaResponses(initialcriteriaResponses);
+        setResponses(initialResponses);
       } catch (error) {
         console.error("Error fetching criteria:", error);
       } finally {
@@ -32,34 +34,36 @@ function CandidateCriteriaForm({ jobId, onSubmit, criteriaResponses, setCriteria
   }, [jobId]);
 
   const handleResponseChange = (criterionId, value) => {
-    setCriteriaResponses((prevcriteriaResponses) => ({
-      ...prevcriteriaResponses,
+    setResponses((prevResponses) => ({
+      ...prevResponses,
       [criterionId]: value,
     }));
   };
 
   const handleSubmit = () => {
   
-    onSubmit(criteriaResponses);
+    onSubmit(responses);
   };
 
   if (loading) return <p>Loading criteria...</p>;
 
-
   return (
     <div >
       {/* <h2>Criteria for Job ID: {jobId}</h2> */}
-      {criteriaList.length > 0 && (
+      {criteriaList.length > 0 ? (
         criteriaList.map((criterion) => (
           <div key={criterion.id} style={{ marginBottom: '20px' }}>
-            <label className='mb-2 w-full text-sm font-medium leading-6 text-gray-900'>{criterion.question}<span className='text-red-500 text-sm'> *</span></label>
-            {criteriaErrors && criteriaErrors[criterion.id] && <p className='text-red-500 text-sm mb-3'>{criteriaErrors[criterion.id]}</p>}
-            <div className='mb-3 flex flex-col gap-1 px-3'>
-            {renderResponseInput(criterion, criteriaResponses[criterion.id], handleResponseChange)}
+            <label className='mb-3 w-full'><strong>{criterion.question}</strong></label>
+            <br />
+            <div className='my-3'>
+            {renderResponseInput(criterion, responses[criterion.id], handleResponseChange)}
             </div>
           </div>
         ))
+      ) : (
+        <p>No criteria found for this job.</p>
       )}
+      <button onClick={handleSubmit} type="button">Submit Responses</button>
     </div>
   );
 }
@@ -74,7 +78,7 @@ function renderResponseInput(criterion, responseValue, handleResponseChange) {
         <select
             value={responseValue}
             onChange={(e) => handleResponseChange(id, e.target.value)}
-            className="w-full md:w-1/2 p-2 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-2 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
             <option value="" className="text-gray-400">Select an option</option>
             {options.map((option, index) => (
@@ -84,7 +88,7 @@ function renderResponseInput(criterion, responseValue, handleResponseChange) {
       );
 
     case 'radio':
-      return <div className="flex gap-2 flex-wrap">
+      return <div className="flex  gap-2">
       {options.map((option, index) => (
         <label
           key={index}
@@ -104,21 +108,21 @@ function renderResponseInput(criterion, responseValue, handleResponseChange) {
     </div>
     
 
-    // case 'checkbox':
-    //   return (
-    //     <label>
-    //       <input
-    //         type="checkbox"
-    //         checked={responseValue === true}
-    //         onChange={(e) => handleResponseChange(id, e.target.checked)}
-    //       />
-    //       {options[0] || "Yes/No"}
-    //     </label>
-    //   );
+    case 'checkbox':
+      return (
+        <label>
+          <input
+            type="checkbox"
+            checked={responseValue === true}
+            onChange={(e) => handleResponseChange(id, e.target.checked)}
+          />
+          {options[0] || "Yes/No"}
+        </label>
+      );
 
     case 'checkbox':
       return options.map((option, index) => (
-        <label key={index} className='flex gap-3'>
+        <label key={index}>
           <input
             type="checkbox"
             value={option}
@@ -137,7 +141,7 @@ function renderResponseInput(criterion, responseValue, handleResponseChange) {
     case 'yes/no':
       return (
         <select
-            className="w-full md:w-1/2 p-2 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-2 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           value={responseValue}
           onChange={(e) => handleResponseChange(id, e.target.value)}
         >

@@ -1,9 +1,9 @@
 
 import "./Login.css";
-import { Link,  } from "react-router-dom";
-import { useState,} from "react";
+import { Link, useNavigate } from "react-router-dom";
+import HeroBanner from "./../../assets/hr-banner3.jpg";
+import { useState, useEffect, useContext } from "react";
 import CandidHRLogo from "../../assets/PNG/Logo_white_transparentB.png";
-import { api } from "../../constants/constants";
 
 function ResetPasswordEmail() {
   const [email, setEmail] = useState();
@@ -16,7 +16,7 @@ function ResetPasswordEmail() {
 
   const requestLinkOnEmail = async (e) => {
     e.preventDefault();
-    const url = `${api}/accounts/send-reset-password-email/`; // Replace with your API endpoint
+    const url = '/accounts/send-reset-password-email/'; // Replace with your API endpoint
     const data = {
       "email": email
     }; // Replace with your JSON body

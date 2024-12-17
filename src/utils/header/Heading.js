@@ -204,14 +204,6 @@ export default function Heading({ userDetails, jobDetail, publishJob, loading, d
                       Share With Users
                     </a>
                   </MenuItem>
-                  <MenuItem>
-                    <a
-                      href={`/app/user/jobs/edit-job/${jobDetail.id}/4/`}
-                      className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                    >
-                      Customize Workflow
-                    </a>
-                  </MenuItem>
                   {/* <form action="#" method="POST">
                     <MenuItem>
                       <button

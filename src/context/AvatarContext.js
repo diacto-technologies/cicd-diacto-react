@@ -1,7 +1,6 @@
 // AvatarContext.js
 import React, { createContext, useContext, useState } from 'react';
 import AuthContext from './AuthContext';
-import { api } from '../constants/constants';
 
 const AvatarContext = createContext();
 
@@ -28,7 +27,7 @@ export const AvatarProvider = ({ children }) => {
             // }
 
             // Fetch the avatar from the server
-            const response = await fetch(`${api}/accounts/avatar/${userId}/`, {
+            const response = await fetch(`/accounts/avatar/${userId}/`, {
                 method: 'GET',
                 headers: {
                     Authorization: "Bearer " + String(authTokens.access),

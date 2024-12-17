@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./Login.css";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // import HeroBanner from "./../../assets/hr-banner3.jpg";
 // import { useCookies } from "react-cookie";
 // import jwt_decode from "jwt-decode";
@@ -13,8 +13,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState(null);
   const { loginUser } = useContext(AuthContext);
-  const location = useLocation();
-  const role = location.state?.role || 'default';
 
   function emailOnChange(e) {
     setEmail(e.target.value);
@@ -30,7 +28,7 @@ const Login = () => {
     e.preventDefault();
     try {
       setFormError(null);
-      await loginUser(e,role);
+      await loginUser(e);
     } catch (error) {
       const err = {};
 

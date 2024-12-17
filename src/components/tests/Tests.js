@@ -9,7 +9,7 @@ import Table from "../../utils/tables/Table";
 import SpinLoader from "../../utils/loaders/SpinLoader";
 import { ToastContainer } from "react-toastify";
 import ReactSelect from "react-select";
-import { api, selectStyle } from "../../constants/constants";
+import { selectStyle } from "../../constants/constants";
 import Select, { components } from "react-select";
 import DefaultAvatar from "../../assets/user-gray.png";
 
@@ -219,7 +219,7 @@ const Tests = () => {
     try {
       setUsersLoading(true);
       const response = await fetch(
-        `${api}/accounts/organizations/${userDetails?.org?.org_id}/users/`,
+        `/accounts/organizations/${userDetails?.org?.org_id}/users/`,
         {
           method: "GET",
           headers: {
@@ -262,7 +262,7 @@ const Tests = () => {
 
   const fetchDomains = async (name) => {
     try {
-      let url = `${api}/test/domains/`;
+      let url = `/test/domains/`;
       if (name) {
         url += `?name=${name}`;
       }
@@ -296,7 +296,7 @@ const Tests = () => {
 
   const fetchCategories = async (name) => {
     try {
-      let url = `${api}/test/categories/`;
+      let url = `/test/categories/`;
       if (selectedDomains) {
         const domainIds = selectedDomains
           .map((domain) => domain.value)
@@ -342,7 +342,7 @@ const Tests = () => {
     try {
       // // console.log("fetching tests");
       setLoadingTests(true);
-      const response = await fetch(`${api}/test/list/`, {
+      const response = await fetch(`/test/list/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -374,7 +374,7 @@ const Tests = () => {
   async function createTest(e) {
     e.preventDefault();
     // Replace 'http://example.com/api/interviews/' with your actual API endpoint
-    const apiUrl = `${api}/test/tests/`;
+    const apiUrl = "/test/tests/";
 
     // Data to be sent in the POST request body
     const postData = {
@@ -421,7 +421,7 @@ const Tests = () => {
   async function createPreBuiltAssessment(e) {
     e.preventDefault();
     // Replace 'http://example.com/api/interviews/' with your actual API endpoint
-    const apiUrl = `${api}/test/prebuiltassessments/${api}`;
+    const apiUrl = "/test/prebuiltassessments/";
 
     // Data to be sent in the POST request body
     const postData = {
@@ -717,7 +717,7 @@ const Tests = () => {
     //console.log("updating sharedwithIds : ", ids)
 
     try {
-      const response = await fetch(`${api}/test/tests/${assessmentToShare?.id}/`, {
+      const response = await fetch(`/test/tests/${assessmentToShare?.id}/`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -768,7 +768,7 @@ const Tests = () => {
   };
 
   async function handleTestAction(testId, action, payload) {
-    const apiUrl = `${api}/test/tests/${testId}/`;
+    const apiUrl = `/test/tests/${testId}/`;
     const headers = {
       "Content-Type": "application/json",
       Authorization: "Bearer " + String(authTokens.access),

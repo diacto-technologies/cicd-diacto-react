@@ -1,7 +1,9 @@
 import { useCallback } from "react";
 
-import { XMarkIcon } from "@heroicons/react/20/solid";
-import { useNavigate } from "react-router-dom";
+import {
+  XMarkIcon,
+} from "@heroicons/react/20/solid";
+import {useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../../context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
@@ -10,11 +12,15 @@ import Table from "../../utils/tables/Table";
 import Select, { components } from "react-select";
 import DefaultAvatar from "../../assets/user-gray.png";
 import AvatarContext from "../../context/AvatarContext";
-import { api } from "../../constants/constants";
 
 const JobList = () => {
   const [cellContextMenu, setCellContextMenu] = useState([]);
-  const { authTokens, user, userDetails, domain } = useContext(AuthContext);
+  const {
+    authTokens,
+    user,
+    userDetails,
+    domain,
+  } = useContext(AuthContext);
   const { avatars, fetchAvatar } = useContext(AvatarContext);
   const [totalCount, setTotalCount] = useState(null);
   const [error, setError] = useState({});
@@ -22,7 +28,7 @@ const JobList = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [jobsLoading, setJobsLoading] = useState(false);
-  const [rowToUpdate, setRowToUpdate] = useState(null);
+  const [rowToUpdate,setRowToUpdate] = useState(null)
   const [searchTerm, setSearchTerm] = useState("");
   const [filterSearchTerm, setFilterSearchTerm] = useState({});
   const [filteredJobs, setFilteredJobs] = useState([]);
@@ -37,51 +43,43 @@ const JobList = () => {
 
   const [columns, setColumns] = useState([]);
   const [tableRowCount, setTableRowCount] = useState("fetching");
-  const [url, setUrl] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
 
   useEffect(() => {
     if (userDetails) {
       // Define the default context menu options
       const defaultContextMenu = [
         {
-          label:
-            '<div class="flex items-center gap-1  px-4 py-1 text-gray-800 hover:bg-gray-100 hover:text-blue-500 cursor-pointer rounded-md"><i class="fa-solid fa-eye"></i><span>View</span></div>',
+          label: "View",
           action: function (e, cell) {
             let job = cell.getRow().getData();
             handleViewJob(job.id);
           },
         },
         {
-          label:
-            '<div class="flex items-center gap-1  px-4 py-1 text-gray-800 hover:bg-gray-100 hover:text-blue-500 cursor-pointer rounded-md"><i class="fa-solid fa-edit"></i><span>Edit</span></div>',
+          label: "Edit",
           action: function (e, cell) {
             let job = cell.getRow().getData();
             handleEditJob(job.id);
           },
         },
         {
-          label:
-            '<div class="flex items-center gap-1  px-4 py-1 text-gray-800 hover:bg-gray-100 hover:text-blue-500 cursor-pointer rounded-md"><i class="fa-solid fa-trash"></i><span>Delete</span></div>',
-          action: function (e, cell) {
-            let job = cell.getRow().getData();
-            setRowToUpdate(cell.getRow());
-            setShowDeleteModal(true)
-            // handleDeleteJob(job.id);
-          },
-        },
-        {
-          label:
-            '<div class="flex items-center gap-1  px-4 py-1 text-gray-800 hover:bg-gray-100 hover:text-blue-500 cursor-pointer rounded-md"><i class="fa-solid fa-share"></i><span>Share</span></div>',
+          label: "Share",
           action: function (e, cell) {
             let job = cell.getRow().getData();
             handleShareJob(job, userDetails);
-            setRowToUpdate(cell.getRow());
+            setRowToUpdate(cell.getRow())
           },
         },
+        // {
+        //   label: "Delete",
+        //   action: function (e, cell) {
+        //     let job = cell.getRow().getData();
+        //     handleDeleteJob(job, cell.getRow());
+        //   },
+        // },
         {
-          label:
-            '<div class="flex items-center gap-1  px-4 py-1 text-gray-800 hover:bg-gray-100 hover:text-blue-500 cursor-pointer rounded-md"><i class="fa-solid fa-copy"></i><span>Copy URL</span></div>',
+          label: "Copy URL",
           action: function (e, cell) {
             let job = cell.getRow().getData();
             handleCopyUrl(job);
@@ -90,12 +88,7 @@ const JobList = () => {
         {
           label: function (e, cell) {
             let published = e.getRow().getData().published;
-            return `<div class="flex items-center gap-1  px-4 py-1 text-gray-800 hover:bg-gray-100 hover:text-blue-500 cursor-pointer rounded-md">
-                      <i class="fa-solid ${
-                        published ? "fa-eye-slash" : "fa-eye"
-                      }"></i>
-                      <span>${published ? "Unpublish" : "Publish"}</span>
-                    </div>`;
+            return published ? "Unpublish" : "Publish";
           },
           action: function (e, cell) {
             let job = cell.getRow().getData();
@@ -125,6 +118,7 @@ const JobList = () => {
       // console.log("UserDetails>>>>>>>>", userDetails)
       setCellContextMenu(defaultContextMenu);
     }
+
   }, [userDetails]);
 
   useEffect(() => {
@@ -132,154 +126,110 @@ const JobList = () => {
       // console.log("Setting Columns........")
       setColumns([
         {
-          title: "Title",
-          field: "title",
-          hozAlign: "left",
-          vertAlign: "middle",
-          width: 300,
+          title: 'Title', field: 'title', hozAlign: "left", vertAlign: "middle", width: 300,
           titleFormatter: function (cell, formatterParams, onRendered) {
-            return (
-              '<div class="column-container">' +
-              `<label class="column-title font-medium">${cell.getValue()}</label>` +
-              "</div>"
-            );
+            return '<div class="column-container">' +
+              `<label class="column-title">${cell.getValue()}</label>` +
+              '</div>';
           },
-          // headerPopup: headerPopupFormatter,
+          // headerPopup: headerPopupFormatter, 
           cellClick: function (e, cell) {
             const jobId = cell.getData().id;
-            navigate(`/app/user/jobs/job/${jobId}/overview`);
-          },
-          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-          headerFilter: true,
-          headerFilterFunc: "like",
-          headerFilterParams: {
-            elementAttributes: {
-              class:
-                "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-              placeholder: "", // Add a placeholder
-            },
-          },
+            navigate(`/app/user/jobs/job/${jobId}/overview`)
+          }, headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, headerFilter: true, headerFilterFunc: "like",
         },
         {
-          title: "Total Applicants",
-          field: "applicants_count",
-          hozAlign: "left",
-          vertAlign: "middle",
-          minWidth: 150,
-          width: 200,
+          title: 'Total Applicants', field: 'applicants_count', hozAlign: "left", vertAlign: "middle", minWidth: 150, width: 200,
           titleFormatter: function (cell, formatterParams, onRendered) {
-            return (
-              '<div class="column-container">' +
+            return '<div class="column-container">' +
               `<label class="column-title">${cell.getValue()}</label>` +
-              "</div>"
-            );
+              '</div>';
           },
           // headerPopup: headerPopupFormatter,
           formatter: function (cell, formatterParams, onRendered) {
             const applicants = cell.getRow().getData().applicants_count; // Assuming 'services' is an array of service names
-            const appliedToday = cell.getRow().getData().applicants_today_count;
-            return applicants === 0
-              ? "No Applicants"
-              : applicants + ` (Applied Today: ${appliedToday})`;
+            const appliedToday = cell.getRow().getData().applicants_today_count
+            return applicants === 0 ? "No Applicants" : applicants + ` (Applied Today: ${appliedToday})`
           },
-          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-          headerFilter: true,
-          headerFilterFunc: "like",
-          headerFilterParams: {
-            elementAttributes: {
-              class:
-                "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-              placeholder: "", // Add a placeholder
-            },
-          },
+          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, headerFilter: true, headerFilterFunc: "like",
         },
         {
-          title: "Experience",
-          field: "experience",
-          hozAlign: "left",
-          vertAlign: "middle",
-          minWidth: 100,
-          maxWidth: 140,
-          headerSort: false,
+          title: 'Experience', field: 'experience', hozAlign: "left", vertAlign: "middle", minWidth: 100, maxWidth: 140, headerSort: false,
           titleFormatter: function (cell, formatterParams, onRendered) {
-            return (
-              '<div class="column-container">' +
+            return '<div class="column-container">' +
               `<label class="column-title">${cell.getValue()}</label>` +
-              "</div>"
-            );
+              '</div>';
           },
+          //   titleFormatter: function (cell, formatterParams, onRendered) {
+          //     // Create the dropdown and date picker HTML element
+          //     let filterHTML = `
+          //     <div class="column-container">
+          //         <label class="column-title">${cell.getColumn().getDefinition().title}</label>
+          //         <select id="exp-filter-operator" class="filter-operator">
+          //             <option value="exact">Equals</option>
+          //             <option value="gt">Greater than</option>
+          //             <option value="lt">Less than</option>
+          //             <option value="gte">Greater than or Equal</option>
+          //             <option value="lte">Less than or Equal</option>
+          //         </select>
+          //         <input type="text" id="exp-text">
+          //     </div>
+          // `;
 
+          //     // Attach event listener to the exp text and dropdown after rendering
+          //     onRendered(() => {
+          //       const expText = document.getElementById("exp-text");
+          //       const filterOperator = document.getElementById("exp-filter-operator");
+
+          //       if (expText && filterOperator) {
+          //         // Listen for changes on either the exp text or the operator dropdown
+          //         const applyFilter = () => {
+          //           const expTextValue = expText.value;
+          //           const operator = filterOperator.value;
+
+          //           // Apply the filter based on the selected operator and date
+          //           if (expTextValue) {
+          //             console.log("Setting Filter...")
+          //             cell.getTable().setFilter("experience", operator, expTextValue);
+          //           } else {
+          //             cell.getTable().clearFilter("experience"); // Clear filter if no date is selected
+          //           }
+          //         };
+
+          //         // Add event listeners to apply the filter when the user changes the text or operator
+          //         expText.addEventListener("change", applyFilter);
+          //         filterOperator.addEventListener("change", applyFilter);
+          //       }
+          //     });
+
+          //     return filterHTML;
+          //   },
           formatter: expFormatter,
-          //  headerPopup: headerPopupFormatter,
-          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-          headerFilter: true,
-          headerFilterFunc: "in",
-          headerFilterParams: {
-            elementAttributes: {
-              class:
-                "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-              placeholder: "", // Add a placeholder
-            },
-          },
+          //  headerPopup: headerPopupFormatter, 
+          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, headerFilter: true, headerFilterFunc: "in"
         },
         {
-          title: "Employment Type",
-          field: "employment_type",
-          hozAlign: "left",
-          vertAlign: "middle",
-          minWidth: 150,
-          headerSort: false,
+          title: 'Employment Type', field: 'employment_type', hozAlign: "left", vertAlign: "middle", minWidth: 150, headerSort: false,
           titleFormatter: function (cell, formatterParams, onRendered) {
-            return (
-              '<div class="column-container">' +
+            return '<div class="column-container">' +
               `<label class="column-title">${cell.getValue()}</label>` +
-              "</div>"
-            );
+              '</div>';
           },
-          // headerPopup: headerPopupFormatter,
-          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-          headerFilter: true,
-          headerFilterFunc: "like",
-          headerFilterParams: {
-            elementAttributes: {
-              class:
-                "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-              placeholder: "", // Add a placeholder
-            },
-          },
+          // headerPopup: headerPopupFormatter, 
+          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, headerFilter: true, headerFilterFunc: "like"
         },
         {
-          title: "Location",
-          field: "location",
-          hozAlign: "left",
-          vertAlign: "middle",
-          minWidth: 150,
-          headerSort: false,
+          title: 'Location', field: 'location', hozAlign: "left", vertAlign: "middle", minWidth: 150, headerSort: false,
           titleFormatter: function (cell, formatterParams, onRendered) {
-            return (
-              '<div class="column-container">' +
+            return '<div class="column-container">' +
               `<label class="column-title">${cell.getValue()}</label>` +
-              "</div>"
-            );
+              '</div>';
           },
-          // headerPopup: headerPopupFormatter,
-          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-          headerFilter: true,
-          headerFilterFunc: "like",
-          headerFilterParams: {
-            elementAttributes: {
-              class:
-                "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-              placeholder: "", // Add a placeholder
-            },
-          },
+          // headerPopup: headerPopupFormatter, 
+          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, headerFilter: true, headerFilterFunc: "like"
         },
         {
-          title: "Close Date",
-          field: "close_date",
-          hozAlign: "left",
-          vertAlign: "middle",
-          minWidth: 150,
+          title: 'Close Date', field: 'close_date', hozAlign: "left", vertAlign: "middle", minWidth: 150, headerSort: false,
           // titleFormatter: function (cell, formatterParams, onRendered) {
           //   return '<div class="column-container">' +
           //     `<label class="column-title">${cell.getValue()}</label>` +
@@ -289,10 +239,8 @@ const JobList = () => {
             // Create the date picker HTML element
             let datePickerHTML = `
             <div class="column-container">
-                <label class="column-title">${
-                  cell.getColumn().getDefinition().title
-                }</label>
-                <input type="date" id="date-picker" class="date-picker border p-1 rounded-md my-1" style="width: -webkit-fill-available;">
+                <label class="column-title">${cell.getColumn().getDefinition().title}</label>
+                <input type="date" id="date-picker" class="date-picker" style="width: -webkit-fill-available;">
             </div>
         `;
 
@@ -321,29 +269,17 @@ const JobList = () => {
           headerClick: (e, column) => {
             e.stopPropagation(); // Prevents the sort from triggering on header click
           },
-          formatter: luxonDateDiffFormatter,
-          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-          headerFilter: emptyHeaderFilter,
-          headerFilterFunc: "like",
+          formatter: luxonDateDiffFormatter, headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, headerFilter: emptyHeaderFilter, headerFilterFunc: "like"
         },
         // { title: 'Services', field: 'services', formatter: servicesFormatter },
         {
-          title: "Status",
-          field: "published",
-          hozAlign: "left",
-          vertAlign: "middle",
-          headerSort: false,
-          formatter: statusFormatter,
-          headerSort: false,
-          minWidth: 150,
+          title: 'Status', field: 'published', hozAlign: "left", vertAlign: "middle", headerSort: false, formatter: statusFormatter, headerSort: false, minWidth: 150,
           titleFormatter: function (cell, formatterParams, onRendered) {
             // Create the dropdown element
             let dropdownHTML = `
             <div class="column-container">
-                <label class="column-title">${
-                  cell.getColumn().getDefinition().title
-                }</label>
-                <select id="status-dropdown" class="status-dropdown w-full p-1 my-1 border rounded-md">
+                <label class="column-title">${cell.getColumn().getDefinition().title}</label>
+                <select id="status-dropdown" class="status-dropdown">
                     <option value="">All</option>
                     <option value="true">Published</option>
                     <option value="false">Unpublished</option>
@@ -362,9 +298,7 @@ const JobList = () => {
                   // Trigger your custom action here
                   // Example: Filter the table by the selected status
                   if (selectedValue) {
-                    cell
-                      .getTable()
-                      .setFilter("published", "like", selectedValue);
+                    cell.getTable().setFilter("published", "like", selectedValue);
                   } else {
                     cell.getTable().clearFilter("pulished"); // Clear the filter if no selection
                   }
@@ -374,90 +308,42 @@ const JobList = () => {
 
             return dropdownHTML;
           },
-          // headerPopup: headerPopupFormatter,
-          headerPopupIcon: `<i class='' title='Filter'></i>`,
-          headerFilter: false,
-          headerFilterFunc: "in",
+          // headerPopup: headerPopupFormatter, 
+          headerPopupIcon: `<i class='' title='Filter'></i>`, headerFilter: false, headerFilterFunc: "in"
         },
         {
-          title: "Created By",
-          field: "owner",
-          hozAlign: "left",
-          vertAlign: "middle",
-          minWidth: 150,
-          headerSort: false,
+          title: 'Created By', field: 'owner', hozAlign: "left", vertAlign: "middle", minWidth: 150, headerSort: false,
           titleFormatter: function (cell, formatterParams, onRendered) {
-            return (
-              '<div class="column-container">' +
+            return '<div class="column-container">' +
               `<label class="column-title">${cell.getValue()}</label>` +
-              "</div>"
-            );
-          },
-          formatter: ownerFormatter,
-          // headerPopup: headerPopupFormatter,
-          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-          headerFilter: true,
-          headerFilterFunc: "like",
-          headerFilterParams: {
-            elementAttributes: {
-              class:
-                "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-              placeholder: "", // Add a placeholder
-            },
-          },
+              '</div>';
+          }, formatter: ownerFormatter,
+          // headerPopup: headerPopupFormatter, 
+          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, headerFilter: true, headerFilterFunc: "like"
         },
         {
-          title: "Shared With",
-          field: "users_shared_with",
-          hozAlign: "left",
-          vertAlign: "middle",
-          minWidth: 150,
-          headerSort: false,
+          title: 'Shared With', field: 'users_shared_with', hozAlign: "left", vertAlign: "middle", minWidth: 150, headerSort: false,
           titleFormatter: function (cell, formatterParams, onRendered) {
-            return (
-              '<div class="column-container">' +
+            return '<div class="column-container">' +
               `<label class="column-title">${cell.getValue()}</label>` +
-              "</div>"
-            );
-          },
-          formatter: avatarFormatter,
-          // headerPopup: headerPopupFormatter,
-          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-          headerFilter: emptyHeaderFilter,
-          headerFilter: false,
+              '</div>';
+          }, formatter: avatarFormatter,
+          // headerPopup: headerPopupFormatter, 
+          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, headerFilter: emptyHeaderFilter, headerFilterFunc: "like"
         },
         {
-          title: "Action",
-          width: 85,
-          maxWidth: 100,
-          hozAlign: "center",
-          field: "Action",
-          headerSort: false,
-          clickMenu: cellContextMenu,
-          formatter: customMenuFormatter,
-          frozen: true,
+          title: 'Action', width: 85, maxWidth: 100, hozAlign: "center", field: 'Action', headerSort: false, clickMenu: cellContextMenu, formatter: customMenuFormatter, frozen: true,
           titleFormatter: function (cell, formatterParams, onRendered) {
-            return (
-              '<div class="column-container">' +
+            return '<div class="column-container">' +
               `<label class="column-title">${cell.getValue()}</label>` +
-              "</div>"
-            );
+              '</div>'
           },
-          headerPopup: headerPopupFormatter,
-          headerPopupIcon: `<i class='' title='Filter'></i>`,
-          headerFilter: emptyHeaderFilter,
+          headerPopup: headerPopupFormatter, headerPopupIcon: `<i class='' title='Filter'></i>`, headerFilter: emptyHeaderFilter, headerFilterFunc: "like"
         },
         // Add more columns as needed
-      ]);
+      ])
     }
-  }, [userDetails, cellContextMenu]);
-
-  useEffect(() => {
-    if (!url) {
-      let joburl = `/filter/job`;
-      setUrl(joburl + `?o=-close_date`);
-    }
-  }, []);
+  }, [userDetails, cellContextMenu])
 
   // useEffect(() => {
 
@@ -508,7 +394,7 @@ const JobList = () => {
     try {
       setUsersLoading(true);
       const response = await fetch(
-        `${api}/accounts/organizations/${userDetails?.org?.org_id}/users/`,
+        `/accounts/organizations/${userDetails?.org?.org_id}/users/`,
         {
           method: "GET",
           headers: {
@@ -528,6 +414,7 @@ const JobList = () => {
 
       const usersSharedWithIds = job.users_shared_with;
 
+
       setUsersLoading(false);
       return { usersData: data.results };
     } catch (error) {
@@ -535,13 +422,13 @@ const JobList = () => {
       setError(error.message);
       setUsersLoading(false);
     }
-  }
+  };
 
   const fetchJobs = async () => {
     try {
       //console.log("fetching JOBS")
       setJobsLoading(true);
-      const response = await fetch(`${api}/jobs/list/`, {
+      const response = await fetch(`/jobs/list/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -594,7 +481,8 @@ const JobList = () => {
     if (usersData && usersData.length > 0) {
       setUsers(usersData);
 
-      const usersSharedWithIds = job.users_shared_with?.map((user) => user.id);
+      const usersSharedWithIds = job.users_shared_with?.map(user => user.id);
+      console.log("shared with : ",job.users_shared_with)
       // set users with whom the job is already shared
       const userSharedWithData = usersData
         .filter(
@@ -634,7 +522,8 @@ const JobList = () => {
   };
 
   const publishJob = async (job, row) => {
-    const jobFormUrl = `${api}/jobs/job/${job.id}/`;
+
+    const jobFormUrl = `/jobs/job/${job.id}/`;
     try {
       const response = await fetch(jobFormUrl, {
         method: "PUT",
@@ -649,7 +538,7 @@ const JobList = () => {
         const data = await response.json();
         // const rowNode = job?.api.getRowNode(job?.node.id);
         // rowNode.setDataValue("published", data?.published);
-        row.update({ published: data?.published });
+        row.update({ "published": data?.published });
         setSuccessMessage("Registration successful!");
         // fetchJobs()
         // Reset the form here if needed
@@ -663,7 +552,9 @@ const JobList = () => {
   };
 
   const closeJob = async (grid) => {
-    const jobFormUrl = `${api}/jobs/job/${grid.data.id}/`;
+
+
+    const jobFormUrl = `/jobs/job/${grid.data.id}/`;
     try {
       const response = await fetch(jobFormUrl, {
         method: "PATCH",
@@ -690,16 +581,15 @@ const JobList = () => {
     }
   };
 
-  const handleDeleteJob = async (jobId, row) => {
-    const jobFormUrl = `${api}/jobs/job/${jobId}/`;
+  const handleDeleteJob = async (job, row) => {
+    const jobFormUrl = `/jobs/job/${job.id}/`;
     try {
       const response = await fetch(jobFormUrl, {
-        method: "PATCH",
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + String(authTokens.access),
         },
-        body: JSON.stringify({ is_deleted: true, deleted_by: userDetails?.id }),
       });
 
       if (response.ok) {
@@ -774,7 +664,7 @@ const JobList = () => {
 
     // Return the HTML for the badge
     return `<div class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium  ring-1 ring-inset ${badgeClass}">${text}</div>`;
-  }
+  };
 
   //
 
@@ -804,7 +694,7 @@ const JobList = () => {
     var job = cell.getRow().getData().job;
 
     return `<i class='fa-solid fa-ellipsis-vertical text-slate-500'></i> `;
-  }
+  };
 
   const servicesFormatter = function (cell, formatterParams, onRendered) {
     const services = cell.getRow().getData().services; // Assuming 'services' is an array of service names
@@ -814,7 +704,7 @@ const JobList = () => {
   //create dummy header filter to allow popup to filter
   function emptyHeaderFilter() {
     return document.createElement("div");
-  }
+  };
 
   function expFormatter(cell, formatterParams, onRendered) {
     const work_experience = cell.getRow().getData(); // Assuming 'services' is an array of service names
@@ -822,7 +712,7 @@ const JobList = () => {
     return work_experience.max_experience
       ? `${work_experience.min_experience} - ${work_experience.max_experience} years`
       : null; // Join services into a string separated by commas
-  }
+  };
 
   function ownerFormatter(cell, formatterParams, onRendered) {
     ////console.log("owner : ",cell.getValue())
@@ -830,8 +720,8 @@ const JobList = () => {
   }
 
   const fieldMapping = {
-    owner: "owner__name",
-    "job.title": "job__title",
+    "owner": "owner__name",
+    "job.title": "job__title"
   };
 
   function avatarFormatter(cell, formatterParams, onRendered) {
@@ -851,60 +741,17 @@ const JobList = () => {
       }
     }
     if (items.length > limit) {
-      const badge = `<div class="me-2 inline-flex items-center justify-center text-ellipsis overflow-hidden rounded-full w-7 h-7 text-xs font-medium  ring-1 ring-inset ${badgeClass}">+${
-        items.length - limit
-      }</div>`;
+      const badge = `<div class="me-2 inline-flex items-center justify-center text-ellipsis overflow-hidden rounded-full w-7 h-7 text-xs font-medium  ring-1 ring-inset ${badgeClass}">+${items.length - limit
+        }</div>`;
       wrapper.innerHTML += badge;
     }
     return wrapper; // Join services into a string separated by commas
   }
 
   function luxonDateDiffFormatter(cell, formatterParams, onRendered) {
-    const rowData = cell.getRow().getData();
-    const closingIn = rowData.closing_in; // Number of days until closing
-    const closeDate = rowData.close_date ? new Date(rowData.close_date) : null;
-
-    // If no closing date, return a placeholder
-    if (!closeDate) {
-      return `<span class="text-gray-500 italic">No closing date</span>`;
-    }
-
-    // Format the closing date as a human-readable string
-    const formattedDate = closeDate.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-    // Apply a warning style if closing is less than 15 days away
-    if (closingIn !== null && closingIn === 0) {
-      return `
-          <div class="flex items-center gap-2 p-2  rounded-md">
-              <i class="fa-solid fa-exclamation-circle text-orange-700"></i>
-              
-              Closed on ${formattedDate}
-          </div>
-      `;
-    }
-    if (closingIn !== null && closingIn <= 15) {
-      return `
-            <div class="flex items-center gap-2 p-2  rounded-md">
-                <i class="fa-regular fa-clock text-orange-700"></i>
-                <span class="  text-orange-600">
-                    <span class="font-medium">${closingIn} days left</span> 
-                </span>
-                Closing on ${formattedDate}
-            </div>
-        `;
-    }
-
-    // Default display for dates more than 15 days away
-    return `
-        <div class="flex items-center gap-2 p-2 ">
-            <i class="fa-solid fa-calendar-check text-green-500"></i>
-            <span >Closing on ${formattedDate}</span>
-        </div>
-    `;
+    // const { inputFormat, units, humanize, invalidPlaceholder } = formatterParams;
+    const value = new Date(cell.getValue()).toDateString();
+    return value;
   }
 
   const Option = (props) => {
@@ -924,6 +771,7 @@ const JobList = () => {
       const sharedWithIds = new Set(usersSharedWith.map((user) => user.id));
       //console.log("sharedWithIds : ", sharedWithIds)
       const updatedIds = selectedOption.map((user) => user.id);
+
 
       setUsersSharedWith(selectedOption);
 
@@ -951,13 +799,14 @@ const JobList = () => {
     const updatedIds = updatedArray.map((user) => user.id);
     setUsersSharedWith(updatedArray);
     updateUserSharedWith(updatedIds);
+
   };
 
   const updateUserSharedWith = async (ids) => {
     //console.log("updating sharedwithIds : ", ids)
 
     try {
-      const response = await fetch(`${api}/jobs/job/${jobToShare.id}/`, {
+      const response = await fetch(`/jobs/job/${jobToShare.id}/`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -969,8 +818,10 @@ const JobList = () => {
       const data = await response.json();
 
       if (response.ok) {
-        const updatedList = users.filter((user) => ids.includes(user.id));
-        rowToUpdate?.update({ users_shared_with: updatedList });
+        const updatedList = users.filter(user => ids.includes(user.id))
+        console.log(updatedList)
+        rowToUpdate?.update({"users_shared_with": updatedList})
+        console.log(rowToUpdate,updatedList)
         //console.log("successfully updated users_shared_with", data)
       } else {
         console.error("error occured");
@@ -980,19 +831,19 @@ const JobList = () => {
     }
   };
 
+  console.log(userDetails)
+
   return (
     <>
       {/* <Heading /> */}
       {userDetails && (
         <div id="jobList" className="w-full h-full p-3 job-list">
           {/* Header Section  */}
-          <div className="md:flex items-center justify-between mt-2 md:mt-0 lg:px-4 px-2 py-2 mb-2 ">
+          <div className="md:flex items-center justify-between mt-2 md:mt-0 lg:px-4 px-2 py-2 mb-4 border-b ">
             <div className="flex justify-between mb-2 md:mb-0">
               <div>
                 <h2 className="text-xl font-semibold md:mb-0 mb-2">Jobs</h2>
-                <p className=" text-sm text-gray-500">
-                  {tableRowCount === 0 ? "No Rows" : tableRowCount + " rows"}
-                </p>
+                <p className=" text-sm text-gray-500">{tableRowCount === 0 ? "No Rows" : tableRowCount + " rows"}</p>
               </div>
               <span className="sm:hidden">
                 <button
@@ -1021,19 +872,11 @@ const JobList = () => {
 
           {/* Job List  */}
           <div
-            className="overflow-auto rounded-xl border"
+            className="overflow-auto rounded-xl"
             style={{ height: "calc(100dvh - 150px)" }}
           >
-            {columns.length && url && (
-              <Table
-                url={url}
-                setTableInstance={setTableInstance}
-                data={filteredJobs}
-                columns={columns}
-                fieldMapping={fieldMapping}
-                setTableRowCount={setTableRowCount}
-              />
-            )}
+            {columns.length && <Table url={`/filter/job`} setTableInstance={setTableInstance} data={filteredJobs} columns={columns} fieldMapping={fieldMapping} setTableRowCount={setTableRowCount} />}
+          
           </div>
         </div>
       )}
@@ -1071,7 +914,7 @@ const JobList = () => {
                 </div>
 
                 {/* Body  */}
-                <div className="bg-white h-5/6 px-2 pb-4 pt-5 sm:p-6 sm:pb-4 ">
+                <div className="bg-white h-5/6 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start h-5/6 ">
                     <div className="mt-3 text-center  h-full w-full sm:ml-4 sm:mt-0 sm:text-left">
                       <div className="col-span-full">
@@ -1091,18 +934,16 @@ const JobList = () => {
                             value={usersSharedWith}
                             onChange={handleSelectedOption}
                             options={users}
-                            isDisabled={
-                              userDetails?.role?.name === "Participant"
-                            }
-                            // defaultValue={}
+                            isDisabled={userDetails?.role?.name === "Participant"}
+                          // defaultValue={}
                           />
                         </div>
                       </div>
 
-                      <div className="h-full">
+                      <div>
                         <ul
                           role="list"
-                          className="divide-y divide-gray-100 h-full overflow-auto px-3"
+                          className="divide-y divide-gray-100 h-5/6 overflow-auto px-2"
                         >
                           {usersSharedWith.length > 0 &&
                             usersSharedWith.map((user, index) => (
@@ -1202,90 +1043,6 @@ const JobList = () => {
 
                   {/* <button onClick={() => handleSave()} type="button" className="h-10 w-full justify-center rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 sm:ml-3 sm:w-auto">Save</button>
                                     <button onClick={() => handleClose()} type="button" className="mt-3 h-10 w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button> */}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showDeleteModal && (
-        <div
-          className="relative  z-30"
-          aria-labelledby="modal-title"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="fixed  inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-
-          <div className="fixed h-full  inset-0  z-30 w-screen overflow-y-auto">
-            <div className="flex min-h-full h-full w-full items-center justify-center p-4 text-center sm:items-center sm:p-0">
-              <div className="relative lg:min-w-96 w-full sm:w-1/3   transform flex-col justify-evenly rounded-lg bg-white text-left shadow-xl ">
-                {/* Header  */}
-                <div className="border-b  rounded-t-lg bg-gray-50 flex justify-between px-5 py-4">
-                  <div className="flex items-center space-x-3">
-                    {/* <img src={Alert} className="w-12 h-12" /> */}
-                    <h3
-                      className="font-bold text-xl text-gray-900"
-                      id="modal-title"
-                    >
-                      Confirm
-                    </h3>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setShowDeleteModal(false);
-                      setRowToUpdate(null);
-                    }}
-                  >
-                    <XMarkIcon className="w-6 h-6" />
-                  </button>
-                </div>
-
-                {/* Body  */}
-                <div className="h-5/6 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                  <div className="sm:flex sm:items-start h-5/6 ">
-                    <div className="mt-3 text-center  h-full w-full sm:ml-4 sm:mt-0 sm:text-left">
-                      <div className="col-span-full">
-                        <div className=" min-w-fit p-10">
-                          <label
-                            for=""
-                            class="block text-base font-medium leading-6 text-gray-900"
-                          >
-                            Are you sure you want to delete 
-                            {rowToUpdate?.getData()?.title}?
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer  */}
-                <div className="bg-gray-50  rounded-b-lg  px-4 py-3 flex justify-end items-center sm:px-6 space-x-3">
-                  <button
-                    type="button"
-                    // disabled={deleting}
-                    onClick={() => {
-                      setShowDeleteModal(false);
-                      handleDeleteJob(rowToUpdate?.getData()?.id,rowToUpdate);
-                    }}
-                    className="h-10  rounded-md disabled:bg-opacity-40 bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-                  >
-                    <i class="fa-solid fa-trash-can me-2"></i>
-                    Delete
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setShowDeleteModal(false);
-                      setRowToUpdate(null);
-                    }}
-                    type="button"
-                    className=" w-20 h-10  justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                  >
-                    Cancel
-                  </button>
                 </div>
               </div>
             </div>

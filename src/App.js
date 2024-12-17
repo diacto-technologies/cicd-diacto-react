@@ -25,7 +25,7 @@ import CreateInterviewFlow from './components/interviews/CreateInterviewFlow';
 import { AvatarProvider } from './context/AvatarContext';
 import VideoComponent from "./components/personality-screening/VideoComponent";
 import JobInterviews from './components/jobs/JobInterviews';
-import ApplicantResumeCopy from './components/applicants/ApplicantResumeCopy';
+import ApplicantResume from './components/applicants/ApplicantResume';
 import ApplicantOverview from './components/applicants/ApplicantOverview';
 import ApplicantPersonalityScreening from './components/applicants/ApplicantPersonalityScreening';
 import Tour from './components/personality-screening/Tour';
@@ -55,25 +55,16 @@ import PersonalInfo from './components/profile/PersonalInfo';
 import Users from './components/profile/Users';
 import Notifications from './components/profile/Notifications';
 import Credits from './components/profile/Credits';
-// // import AdminOnboarding from './components/register/AdminOnbording';
-import { ToastContainer } from 'react-toastify';
-import DemoList from './components/superuser-components/DemoList';
-import ApplicantResume from './components/applicants/ApplicantResume';
-import Organization from './components/register/Organization';
-import Admin from './components/register/Admin';
-
 
 function App() {
   return (
     <div className="flex font-sans app-main">
-      <ToastContainer/>
       <BrowserRouter>
         {/* Public Routes */}
-        {/* Test  */}
         <Routes>
           <Route path="/app/page-not-found/" element={<PageNotFound />} />
           <Route path="/app/candidate/:jobkey/" element={<CandidateForm />} />
-          {/* <Route path="/app/candidate/:jobkey/questionnaire/" element={<Questionnaire />} /> */}
+          <Route path="/app/candidate/:jobkey/questionnaire/" element={<Questionnaire />} />
           <Route path="/app/candidate/personality-screening/:candidateId/:screeningId/" element={<Tour />} />
           <Route path="/app/candidate/personality-screening/:candidateId/:screeningId/tour/" element={<ScreeningTour />} />
           <Route path="/app/candidate/personality-screening/:candidateId/:screeningId/start/" element={<VideoComponent />} />
@@ -89,24 +80,16 @@ function App() {
             <Routes>
               <Route path="/app/register/" element={<RegisterUser />} />
               <Route path="/app/login/" element={<Login />} />
-              <Route path="/admin/login/" element={<Login />} state={{ role: 'admin' }} />
               <Route path="/app/send-reset-password-email/" element={<ResetPasswordEmail />} />
-              {/* <Route path="/app/admin-reset-password/" element={<AdminOnboarding />} /> */}
-              <Route path="/app/organization/signup" element={<Organization />} />
-              <Route path="/app/organization/admin" element={<Admin />} />
               <Route path="/app/reset-password/:uid/:token" element={<ResetPassword />} />
               <Route path="/app/" element={<PrivateRoute />}>
                 <Route path="/app/" element={<Base />}>
-                  <Route path="/app/admin/demos/" element={<DemoList />} />
-
-                  <Route path="/app/user/profile/" element={<Profile2 />}>
-                    {/* Default route when no sub-route is specified */}
-                    <Route index element={<PersonalInfo />} />
-                    <Route path="personal-info" element={<PersonalInfo />} />
-                    <Route path="/app/user/profile/users/" element={<Users />} />
-                    <Route path="/app/user/profile/notifications/" element={<Notifications />} />
-                    <Route path="/app/user/profile/credits/" element={<Credits />} />
-                  </Route>
+                  <Route path="/app/user/profile/" element={<Profile />} />
+                  {/* <Route path="/app/user/profile/" element={<PersonalInfo />} /> */}
+                  {/* <Route path="/app/user/profile/personalInfo/" element={<PersonalInfo />} /> */}
+                  {/* <Route path="/app/user/profile/users/" element={<Users />} /> */}
+                  {/* <Route path="/app/user/profile/notifications/" element={<Notifications />} /> */}
+                  {/* <Route path="/app/user/profile/credits/" element={<Credits />} /> */}
                   <Route path="/app/user/jobs/" element={<JobList />} />
                   <Route path="/app/user/jobs/job/:jobId/" element={<JobDetail />}>
                     <Route path="/app/user/jobs/job/:jobId/overview/" element={<JobOverview />} />
@@ -127,7 +110,7 @@ function App() {
                   <Route path="/app/user/applicants/" element={<Applicants />} />
                   <Route path="/app/user/applicants/applicant/:applicantId/profile/" element={<ApplicantProfile />}>
                     <Route path="/app/user/applicants/applicant/:applicantId/profile/overview/" element={<ApplicantOverview />} />
-                    <Route path="/app/user/applicants/applicant/:applicantId/profile/resume-screening/:serviceId/" element={<ApplicantResumeCopy />} />
+                    <Route path="/app/user/applicants/applicant/:applicantId/profile/resume-screening/:serviceId/" element={<ApplicantResume />} />
                     <Route path="/app/user/applicants/applicant/:applicantId/profile/automated-video-interview/:serviceId/" element={<ApplicantPersonalityScreening />} />
                     <Route path="/app/user/applicants/applicant/:applicantId/profile/assessment/:serviceId/" element={<ApplicantTracking />} />
                     <Route path="/app/user/applicants/applicant/:applicantId/profile/comments/" element={<ProfileComments />} />

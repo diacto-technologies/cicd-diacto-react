@@ -4,7 +4,6 @@ import Xarrow, { useXarrow, Xwrapper } from 'react-xarrows';
 import { useContext, useState } from 'react';
 import AuthContext from '../../context/AuthContext';
 import { useAsync } from 'react-select/async';
-import { api } from '../../constants/constants';
 
 
 const AssignedWorkflow = ({ jobId, selectedCandidate, selectedRow, selectedWorkflow, setSelectedWorkflow, workflows }) => {
@@ -29,7 +28,7 @@ const AssignedWorkflow = ({ jobId, selectedCandidate, selectedRow, selectedWorkf
     }
 
     const assignWorkflow = async () => {
-        const jobFormUrl = `${api}/jobs/job/${jobId}/`;
+        const jobFormUrl = `/jobs/job/${jobId}/`;
 
         try {
             setError(null)

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SpinLoader from "../../utils/loaders/SpinLoader";
-import { api } from "../../constants/constants";
 
 const Completed = () => {
   const { testlogId, candidateId, uniqueId, testId, assessmentType } = useParams();
@@ -20,7 +19,7 @@ const Completed = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${api}/test/test-status/?test_log=${testlogId}`, {
+      const response = await fetch(`/test/test-status/?test_log=${testlogId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -73,7 +72,7 @@ const Completed = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${api}/test/testlog/${pk}/`, {
+      const response = await fetch(`/test/testlog/${pk}/`, {
         method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

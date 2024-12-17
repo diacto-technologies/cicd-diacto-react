@@ -13,8 +13,8 @@ import VoiceAnimation from "./VoiceAnimation";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { api } from "../../constants/constants";
 const VideoComponent = () => {
+  console.count("VideoComponent")
   const { candidateId, screeningId } = useParams();
   const [showStructure, setShowStructure] = useState(false);
   const videoRef = useRef(null);
@@ -54,6 +54,7 @@ const VideoComponent = () => {
   const [submittingAnswer, setSubmittingAnswer] = useState(false);
 
   useEffect(() => {
+    console.count("fetching data");
     // markAsStarted()
     fetchCandidateAndScreeningDetails();
   }, [candidateId, screeningId]);
@@ -113,7 +114,7 @@ const VideoComponent = () => {
 
     try {
       const screeningResponse = await fetch(
-        `${api}/personality-screening/personality-screenings/${screeningId}/`,
+        `/personality-screening/personality-screenings/${screeningId}/`,
         {
           method: "PATCH",
           headers: headers,
@@ -223,12 +224,12 @@ const VideoComponent = () => {
 
       try {
         const [candidateResponse, screeningResponse] = await Promise.all([
-          fetch(`${api}/candidates/candidate-details/${candidateId}/`, {
+          fetch(`/candidates/candidate-details/${candidateId}/`, {
             method: "GET",
             headers: headers,
           }),
           fetch(
-            `${api}/personality-screening/personality-screenings/${screeningId}/`,
+            `/personality-screening/personality-screenings/${screeningId}/`,
             {
               method: "GET",
               headers: headers,
@@ -286,7 +287,7 @@ const VideoComponent = () => {
   const fetchQuestions = async (questionSetId) => {
     try {
       const response = await fetch(
-        `${api}/interview/questions/?question_set_id=${questionSetId}`
+        `/interview/questions/?question_set_id=${questionSetId}`
       );
 
       if (!response.ok) {
@@ -416,7 +417,7 @@ const VideoComponent = () => {
       answerData.append("screening_id", screeningDetails?.id);
       //   console.log(answerData);
 
-      const response = await fetch(`${api}/interview/answers/`, {
+      const response = await fetch(`/interview/answers/`, {
         method: "POST",
         body: answerData,
       });
@@ -473,7 +474,7 @@ const VideoComponent = () => {
         service: "Personality Screening",
       };
 
-      const response = await fetch(`${api}/interview/update-step/`, {
+      const response = await fetch(`/interview/update-step/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -526,7 +527,7 @@ const VideoComponent = () => {
 
       // Update state or perform further actions
     } catch (error) {
-      setError("Something went wrong!");
+      setError(error);
     }
   };
 
@@ -683,7 +684,7 @@ const VideoComponent = () => {
                 >
                   <section className="relative h-full w-full isolate overflow-hidden flex items-center justify-center">
                     <div className="background-svg absolute bottom-0">
-                      {/* <svg
+                      <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 1440 320"
                       >
@@ -692,7 +693,7 @@ const VideoComponent = () => {
                           fillOpacity={1}
                           d="M0,64L48,53.3C96,43,192,21,288,64C384,107,480,213,576,229.3C672,245,768,171,864,165.3C960,160,1056,224,1152,234.7C1248,245,1344,203,1392,181.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
                         ></path>
-                      </svg> */}
+                      </svg>
                     </div>
                     <div className="mx-auto max-w-2xl lg:max-w-4xl z-40">
                       {/* <img className="mx-auto h-12" src="https://tailwindui.com/img/logos/workcation-logo-indigo-600.svg" alt="" /> */}
@@ -908,15 +909,12 @@ const VideoComponent = () => {
                               <VoiceAnimation />
                             </div>
                           ) : (
-                            <div className="w-32 h-32 bg-gray-200 rounded-full shadow-xl ring-4 overflow-hidden flex items-center justify-center">
-                            <div id="bars" className="">
-                              <div class="bar2"></div>
-                              <div class="bar2"></div>
-                              <div class="bar2"></div>
-                              <div class="bar2"></div>
-                              {/* <div class="bar"></div> */}
-                            </div>
-                          </div>
+                            <img
+                              ref={imageRef}
+                              className=" w-32 h-32 rounded-full shadow-xl ring-4"
+                              src={Axel}
+                              alt="Image"
+                            />
                           )}
                           {/* {/* <img
                             ref={imageRef}

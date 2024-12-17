@@ -7,7 +7,7 @@ import {
 import AuthContext from "../../context/AuthContext";
 import { useFetchJobs } from "../../constants/jobs/constants";
 import { useFetchApplicants } from "../../constants/candidates/constants";
-import { api, selectStyle } from "../../constants/constants";
+import { selectStyle } from "../../constants/constants";
 import ReactSelect from "react-select";
 import Switch2 from "../../utils/swtiches/Switch2";
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -78,7 +78,6 @@ const AssignModal = ({ handleClose }) => {
         clearTimeout(debounceTimeout1.current);
       }
       debounceTimeout1.current = setTimeout(() => {
-        console.log("args : ",args)
         func(...args);
       }, delay);
     };
@@ -91,9 +90,7 @@ const AssignModal = ({ handleClose }) => {
   // Handle input change in ReactSelect
   const handleInputChange = (newValue, actionMeta) => {
     if (actionMeta?.action === "input-change") {
-      const shouldFetchShortlisted = true; 
-      console.log("shouldFetchShortlisted : ",shouldFetchShortlisted)
-      debouncedFetchCandidates(newValue, selectedJob.value,shouldFetchShortlisted); // Use the debounced function
+      debouncedFetchCandidates(newValue, selectedJob.value); // Use the debounced function
     }
   };
 
@@ -193,7 +190,7 @@ const AssignModal = ({ handleClose }) => {
           valid_to: new Date(validTo),
           preferences: {},
         };
-        const response = await fetch(`${api}/test/share/`, {
+        const response = await fetch(`/test/share/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -336,17 +333,18 @@ const AssignModal = ({ handleClose }) => {
                     <div class="p-4 md:p-5 mb-4">
                       <form
                         // id="create-test-form"
-                        class="space-y-6"
+                        class="space-y-4"
                         // onSubmit={ShareTest}
                       >
-                        <div >
+                        <div>
                           <label
+                            htmlFor="valid-to"
                             class="block mb-2  font-medium text-gray-900 "
                           >
                             <span>
                               Job<span className="text-red-600">*</span>
                             </span>
-                            <p className="text-[0.8rem] text-gray-500 font-light">
+                            <p className="text-xs text-gray-400 font-light">
                               Select the job opening that the candidate has
                               applied for
                             </p>
@@ -361,33 +359,26 @@ const AssignModal = ({ handleClose }) => {
                               if (selectedOption) {
                                 debouncedFetchCandidates(
                                   null,
-                                  selectedOption.value,
-                                  true
+                                  selectedOption.value
                                 );
                                 setSelectedJob(selectedOption);
                               }
                             }}
                             options={jobOptions}
                             styles={selectStyle}
-                            
                           />
                         </div>
 
                         <div>
                           <label
+                            htmlFor="valid-to"
                             class="block mb-2  font-medium text-gray-900 "
                           >
-                            <span>
-                              Candidates<span className="text-red-600">*</span>
-                            </span>
-                            <p className="text-[0.8rem] text-gray-500 font-light">
-                              Select shortlisted candidates for the selected job
-                            </p>
+                            Candidate
                           </label>
                           <ReactSelect
                             className="text-sm md:w-[90%] min-w-fit"
-                            placeholder="Select candidates to share"
-                            noOptionsMessage={() => "No shortlisted candidates found"}
+                            placeholder="Select candidate to share"
                             isMulti
                             isDisabled={!selectedJob}
                             isLoading={loadingApplicants}

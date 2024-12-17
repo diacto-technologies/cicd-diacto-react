@@ -2,7 +2,6 @@ import { useState, useRef, useContext } from 'react';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { ChevronDownIcon, TrashIcon } from '@heroicons/react/20/solid';
 import AuthContext from '../../context/AuthContext';
-import { api } from '../../constants/constants';
 
 const feedback = {
     id: 1,
@@ -26,7 +25,7 @@ const FeedbackList = ({ setComments, comment, candidateName, img }) => {
     const deleteComment = async (stepName,id) => {
         try {
             setDeleting(true)
-            const response = await fetch(`${api}/interview/interview-step-feedback/${id}/`,
+            const response = await fetch(`/interview/interview-step-feedback/${id}/`,
                 {
                     method: "DELETE",
                     headers: {

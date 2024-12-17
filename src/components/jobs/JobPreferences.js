@@ -3,7 +3,7 @@ import Switch from "../../utils/swtiches/Switch";
 import CreatableSelect from "react-select/creatable";
 import PreferenceSwitch from "../../utils/swtiches/PreferenceSwitch";
 import Checkbox from "../../utils/checkbox/Checkbox";
-import { api, selectStyle } from "../../constants/constants";
+import { selectStyle } from "../../constants/constants";
 import Select from "react-select";
 import { useParams } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
@@ -58,7 +58,7 @@ const JobPreferences = () => {
   const fetchPreference = async () => {
     try {
       const response = await fetch(
-        `${api}/resume_parser/resume-screening-preferences/?job_id=${jobId}`, // No trailing slash after jobId
+        `/resume_parser/resume-screening-preferences/?job_id=${jobId}`, // No trailing slash after jobId
         {
           method: "GET",
           headers: {

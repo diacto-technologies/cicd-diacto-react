@@ -4,36 +4,25 @@ phases:
   install:
     runtime-versions:
       nodejs: 20
-
+   
     commands:
-        # Clear npm cache to avoid issues with corrupted archives
-        - npm cache clean --force
-        
-        # Install dependencies
+        # install npm
         - npm install
-        
-        # Install babel plugin
         - npm install --save-dev @babel/plugin-proposal-private-property-in-object
         
-        # Optionally update ESLint to avoid deprecated version
-        - npm install eslint@latest --save-dev
-        
-        # Check node and npm versions for debugging purposes
-        - node -v
-        - npm -v
-
+       
   build:
     commands:
-        # Run build script
+        # run build script
         - npm run-script build
-
+     
 artifacts:
-  # Include all files required to run the application
-  # Exclude node_modules to avoid overwriting issues on deploy
+  # include all files required to run application
+  # notably excluded is node_modules, as this will cause overwrite error on deploy
   files:
     - public/**/*
     - src/**/*
     - package.json
-    - index.js
+    - login-test.js
     - appspec.yml
     - scripts/**/*

@@ -16,17 +16,15 @@ import {
   BriefcaseIcon,
 } from "@heroicons/react/24/outline";
 import ProfileComments from "./ProfileComments";
-import { api, getServiceIcon, selectStyle } from "../../constants/constants";
+import { getServiceIcon, selectStyle } from "../../constants/constants";
 import ApplicantTracking from "./ApplicantTracking";
 import Select from "react-select";
-import ApplicantResumeCopy from "./ApplicantResumeCopy";
-// import ApplicantResumeCopy from "./ApplicantResumeCopy";
 
 const ApplicantProfile = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const location = useLocation();
   const [tabs, setTabs] = useState([]);
-  const [currentStage, setCurrentStage] = useState("applicant-profile");
+  const [currentStage, setCurrentStage] = useState("overview");
   const [scores, setScores] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const { orgServices, authTokens, userDetails } = useContext(AuthContext);
@@ -102,7 +100,10 @@ const ApplicantProfile = () => {
 
   useEffect(() => {
     const paths = location.pathname.split("/");
-
+    console.log(paths[paths.length - 2] !== "" &&
+      !defaultTabs.includes(paths[paths.length - 2])
+      ? paths[paths.length - 3]
+      : paths[paths.length - 2])
     setCurrentStage(
       paths[paths.length - 2] !== "" &&
         !defaultTabs.includes(paths[paths.length - 2])
@@ -195,28 +196,28 @@ const ApplicantProfile = () => {
   // }
 
   const handleTabClick = (tab) => {
-    console.log(tab);
+
 
     const serviceMapping = {
-      assessment: "test",
-      "automated-video-interview": "personality-screening",
-      "resume-screening": "resume-screening",
-    };
-    const service = orgServices.find((s) => s.key === serviceMapping[tab]);
+      "assessment" : "test",
+      "automated-video-interview" : "personality-screening",
+      "resume-screening" : "resume-screening"
+    }
+    const service = orgServices.find(s => s.key === serviceMapping[tab])
 
     if (service) {
-      navigate(
-        `/app/user/applicants/applicant/${applicantId}/profile/${tab}/${service?.id}/`
-      );
+      console.log(service)
+      navigate(`/app/user/applicants/applicant/${applicantId}/profile/${tab}/${service?.id}/`)
     }
 
     setCurrentStage(tab);
+    
   };
 
   const fetchApplicants = async () => {
     //console.log("fetching dataset")
     try {
-      const response = await fetch(`${api}/candidates/candidate/${applicantId}/`, {
+      const response = await fetch(`/candidates/candidate/${applicantId}/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -229,21 +230,8 @@ const ApplicantProfile = () => {
       const data = await response.json();
 
       if (data) {
-        if (typeof data.location === "string") {
-          try {
-            const parsedLocation = JSON.parse(data.location);
-            if (typeof parsedLocation === "object" && parsedLocation !== null) {
-              data.location = parsedLocation; // Update `location` to the parsed object
-            } else {
-              console.error("Invalid location format, expected an object.");
-            }
-          } catch (e) {
-            console.error("Failed to parse location as JSON:", e.message);
-          }
-        }
-
         setApplicant(data);
-        // setResumeDetail(data.resumes[0]);
+        setResumeDetail(data.resumes[0]);
         const formatted_jobs = data.applied_jobs?.map((job) => ({
           ...job,
           label: job.title,
@@ -322,10 +310,11 @@ const ApplicantProfile = () => {
   };
 
   const fetchApplicantStagesByJob = async () => {
+    console.log("fetching selectedJob", selectedJob);
     if (selectedJob && applicantId) {
       try {
         const response = await fetch(
-          `${api}/candidates/stages/?candidate_id=${applicantId}&job_id=${selectedJob?.id}`,
+          `/candidates/stages/?candidate_id=${applicantId}&job_id=${selectedJob?.id}`,
           {
             method: "GET",
             headers: {
@@ -340,16 +329,7 @@ const ApplicantProfile = () => {
         const data = await response.json();
 
         if (data) {
-          console.log(data);
           const existingStages = [];
-          // const applicantProfile = {
-          //   id: 0,
-          //   key: "applicant-profile",
-          //   name: "Applicant Profile",
-          //   completed: true,
-          //   status_text: null,
-          // };
-          // existingStages.push(applicantProfile);
 
           Object.keys(data["stages"]).forEach((key) => {
             const item = data["stages"][key];
@@ -364,13 +344,13 @@ const ApplicantProfile = () => {
                 approved_by: item["details"]["approved_by"] || false,
                 updated_by: item["details"]["updated_by"] || false,
                 updated_at: item["details"]["updated_at"] || null,
-                status_text: item["details"]["status_text"] || "",
+                status_text : item["details"]["status_text"] || ""
               });
             }
           });
 
-          console.log(existingStages);
           setStages(existingStages);
+          console.log("stages : ", existingStages);
         }
       } catch (error) {
         setError(error);
@@ -437,6 +417,8 @@ const ApplicantProfile = () => {
       iconClass: iconClass,
     };
   }
+
+  console.log(stages)
 
   return (
     <>
@@ -509,49 +491,26 @@ const ApplicantProfile = () => {
             </div>
 
             {/* Stages and Content  */}
-            <div
-              style={{ height: "calc(100dvh - 120px)" }}
-              className=" w-full overflow-auto"
-            >
+            <div style={{ height: "calc(100dvh - 120px)" }} className=" w-full overflow-auto">
               <div className="w-full ps-5 pe-10 mt-5 pb-3 bg-gray-50 mb-3 border-b">
                 <div className="w-full  bg-white border rounded-md">
                   <div className="flex items-center justify-between p-3 mb-2 border-b">
                     <div>
-                      <label className="">Stages</label>
-                      <p className="text-sm text-gray-500">
-                        Click on a stage below to see more details
-                      </p>
+                    <label className="">Stages</label>
+                    <p className="text-sm text-gray-500">Click on a stage below to see more details</p>
                     </div>
-                    {/* <button
+                    <button
                       onClick={() => {
                         setCurrentStage("overview");
                       }}
                       className="text-blue-500 flex items-center gap-2 "
                     >
                       <ArrowSmallRightIcon className="w-5 h-5" /> Go to Overview
-                    </button> */}
+                    </button>
                   </div>
 
                   {stages && stages.length > 0 && (
                     <div class="timeline flex gap-5 mt-2 p-3 pb-4">
-                      <button
-                        onClick={() => handleTabClick("applicant-profile")}
-                        className={`profile-arrow flex justify-evenly items-center font-medium transition-transform duration-100   px-4 rounded-md applicant-profile
-                           ${
-                             currentStage === "applicant-profile" &&
-                             "border-b-4"
-                           }
-                          `}
-                      >
-                       
-                        <div className="flex flex-col items-start justify-start">
-                          <span className="stage-name w-full text-start text-ellipsis">
-                            Applicant Profile
-                          </span>
-                          
-                        </div>
-                      </button>
-
                       {stages.map((stage) => (
                         <button
                           onClick={() => handleTabClick(stage.key)}
@@ -560,45 +519,21 @@ const ApplicantProfile = () => {
                              currentStage === stage.key.toLowerCase() &&
                              "border-b-4"
                            }
-                           ${stage.status_text === "Completed" ? "active" : ""}
-                           ${
-                             stage.status_text === "Under Review"
-                               ? "pending"
-                               : ""
-                           }
-                           ${stage.status_text === "On Hold" ? "on-hold" : ""}
-                           ${
-                             stage.status_text === "Not Shortlisted"
-                               ? "rejected"
-                               : ""
-                           }
-                           ${
-                             stage.status_text === "Shortlisted"
-                               ? "cleared"
-                               : ""
-                           }
-                           ${
-                             stage.key.toLowerCase() === "applicant-profile"
-                               ? "applicant-profile"
-                               : ""
-                           }
+                           ${stage.status_text === "Completed" && "active"}
+                           ${stage.status_text === "Under Review" && "pending"}
+                           ${stage.status_text === "On Hold"  && "on-hold"}
+                           ${stage.status_text === "Not Shortlisted"  && "rejected"}
+                           ${stage.status_text === "Shortlisted"  && "cleared"}
                           `}
                         >
-                          {stage?.updated_by?.profile_pic && (
-                            <img
-                              title={stage?.updated_by?.name}
-                              className="ms-2 rounded-full w-8 h-8 ring-2 ring-gray-400"
-                              src={stage?.updated_by?.profile_pic}
-                            />
-                          )}
+                          {stage?.updated_by?.profile_pic && <img title={stage?.updated_by?.name} className="ms-2 rounded-full w-8 h-8 ring-2 ring-gray-400" src={stage?.updated_by?.profile_pic} />}
                           <div className="flex flex-col items-start justify-start">
-                            <span className="stage-name w-full text-start text-ellipsis">
-                              {stage.name}
-                            </span>
-                            <span className="stage-name w-full text-start text-ellipsis text-xs font-normal">
-                              {stage.updated_at &&
-                                new Date(stage.updated_at).toLocaleString()}
-                            </span>
+                          <span className="stage-name w-full text-start text-ellipsis">
+                            {stage.name}
+                          </span>
+                          <span className="stage-name w-full text-start text-ellipsis text-xs font-normal">
+                            {stage.updated_at && new Date(stage.updated_at).toLocaleString()}
+                          </span>
                           </div>
                         </button>
                       ))}
@@ -609,7 +544,7 @@ const ApplicantProfile = () => {
               {/* Body  */}
 
               <div className="overflow-auto grow w-full flex flex-col items-center justify-start">
-                {currentStage === "applicant-profile" && (
+                {currentStage === "overview" && (
                   <div className="w-5/6">
                     <ApplicantOverview
                       jobId={selectedJob?.id}
@@ -620,7 +555,7 @@ const ApplicantProfile = () => {
                 )}
                 {currentStage === "resume-screening" && (
                   <>
-                    <ApplicantResumeCopy
+                    <ApplicantResume
                       setStages={setStages}
                       setResumeDetail={setResumeDetail}
                       jobId={selectedJob?.id}
@@ -633,10 +568,7 @@ const ApplicantProfile = () => {
                 {currentStage === "automated-video-interview" && (
                   <>
                     <div className="w-5/6 h-full">
-                      <ApplicantPersonalityScreening  
-                      setStages={setStages}
-                      jobId={selectedJob?.id}
-                      applicant={applicant} />
+                      <ApplicantPersonalityScreening jobId={selectedJob?.id} />
                     </div>
                   </>
                 )}

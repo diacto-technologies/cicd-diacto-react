@@ -6,7 +6,6 @@ import Table from "../../utils/tables/Table";
 import AuthContext from "../../context/AuthContext";
 
 import AssignedWorkflow from "./AssignedWorkflow";
-import { api } from "../../constants/constants";
 
 
 const JobInterviews = () => {
@@ -177,7 +176,7 @@ const JobInterviews = () => {
         //console.log("fetching dataset")
         try {
             setLoading(true)
-            const response = await fetch(`${api}/jobs/job/${jobId}/`,
+            const response = await fetch(`/jobs/job/${jobId}/`,
                 {
                     method: "GET",
                     headers: {
@@ -204,7 +203,7 @@ const JobInterviews = () => {
     const fetchApplicants = async () => {
         try {
             setLoading(true)
-            const response = await fetch(`${api}/candidates/resume-screening-completed-candidates/${jobId}/`,
+            const response = await fetch(`/candidates/resume-screening-completed-candidates/${jobId}/`,
                 {
                     method: "GET",
                     headers: {
@@ -232,7 +231,7 @@ const JobInterviews = () => {
         try {
             console.log("fetching Interviews")
             setWorkflowLoading(true)
-            const response = await fetch(`${api}/interview/interview-modules/`,
+            const response = await fetch(`/interview/interview-modules/`,
                 {
                     method: "GET",
                     headers: {
@@ -260,7 +259,7 @@ const JobInterviews = () => {
         try {
             console.log("fetching Interviews")
             setWorkflowLoading(true)
-            const response = await fetch(`${api}/interview/job/${jobId}/interview-modules/`,
+            const response = await fetch(`/interview/job/${jobId}/interview-modules/`,
                 {
                     method: "GET",
                     headers: {

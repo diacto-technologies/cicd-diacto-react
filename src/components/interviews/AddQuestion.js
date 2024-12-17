@@ -1,89 +1,86 @@
-import React, { useContext, useState } from "react";
-import Select from "react-select";
-import AuthContext from "../../context/AuthContext";
-import { selectStyle } from "../../constants/constants";
+import React, { useContext, useState } from 'react';
+import Select from 'react-select';
+import AuthContext from '../../context/AuthContext';
+import { selectStyle } from '../../constants/constants';
 
-const AddQuestion = ({
-  selectedQuestionSet,
-  handleTypeChange,
-  answerTypes,
-  questions,
-  setQuestions,
-  setSelectedAnswerType,
-  selectedAnswerType,
-  selectTheme,
-}) => {
-  const { authTokens, userDetails } = useContext(AuthContext);
-  const [question, setQuestion] = useState({
-    text: "",
-    time_limit: 30,
-  });
+const AddQuestion = ({ selectedQuestionSet, handleTypeChange, answerTypes,questions,setQuestions,setSelectedAnswerType,selectedAnswerType, selectTheme}) => {
 
-  async function addQuestion(e) {
-    e.preventDefault();
-    if (question.text && question.time_limit) {
-      const postData = {
-        type: selectedAnswerType.value,
-        text: question?.text,
-        time_limit: question?.time_limit,
-        created_by: userDetails?.id,
-        question_set: selectedQuestionSet ? selectedQuestionSet?.id : null,
-      };
+    const { authTokens, userDetails } = useContext(AuthContext);
+    const [question, setQuestion] = useState({
+        text: '',
+        time_limit: 30
+    });
 
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + String(authTokens.access),
-      };
-      try {
-        const apiUrl = "/interview/questions/";
+    async function addQuestion(e) {
+        e.preventDefault()
+        if (question.text && question.time_limit) {
 
-        const response = await fetch(apiUrl, {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(postData),
-        });
+            const postData = {
+                type: selectedAnswerType.value,
+                text: question?.text,
+                time_limit: question?.time_limit,
+                created_by: userDetails?.id,
+                question_set: selectedQuestionSet ? selectedQuestionSet?.id : null
+            }
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+            const headers = {
+                'Content-Type': 'application/json',
+                Authorization: "Bearer " + String(authTokens.access),
+            };
+            try {
+                const apiUrl = '/interview/questions/';
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(postData)
+                })
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+
+                if (data) {
+
+
+                    data["label"] = data.text || ""
+                    data["value"] = data.id 
+                    setQuestions([...questions, data]); // Add new question to the list
+                    setSelectedAnswerType(answerTypes[0])
+                    setQuestion({
+                        text: '',
+                        time_limit: 30,
+
+                    })
+                    setSelectedAnswerType(answerTypes[0])
+                }
+
+            } catch (error) {
+                console.error('Error creating interview module:', error);
+            }
         }
-
-        const data = await response.json();
-
-        if (data) {
-          data["label"] = data.text || "";
-          data["value"] = data.id;
-          setQuestions([...questions, data]); // Add new question to the list
-          setSelectedAnswerType(answerTypes[0]);
-          setQuestion({
-            text: "",
-            time_limit: 30,
-          });
-          setSelectedAnswerType(answerTypes[0]);
-        }
-      } catch (error) {
-        console.error("Error creating interview module:", error);
-      }
     }
-  }
 
     return (
-        <form onSubmit={addQuestion} className="bg-[#f8f8ff] space-y-3 rounded-sm px-3 py-1 shadow-md ring-1 ring-blue-600/20">
+        <form onSubmit={addQuestion} className="bg-[#f8f8ff] space-y-3 rounded-sm p-3 shadow-md ring-1 ring-blue-600/20">
             <label className="text-sm font-medium text-gray-900">Add questions to your questionnaire</label>
-            <div className="inline-flex w-full items-center space-x-4 ">
-                <img className="w-6 h-6" src="https://cdn-icons-png.flaticon.com/128/8898/8898945.png" alt="icon" />
+            <div className="inline-flex w-full items-center space-x-4">
+                <img className="w-10 h-10" src="https://cdn-icons-png.flaticon.com/128/8898/8898945.png" alt="icon" />
                 <input
                     type="text"
                     onChange={(e) => setQuestion({ ...question, text: e.target.value })}
                     value={question.text}
                     name="text"
                     id="text"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full py-1 px-2"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     placeholder="Type your question here.."
                     required
                 />
             </div>
-            <div className="">
-                <div className="flex flex-wrap items-center gap-4 pb-1 border-b">
+            <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-4 pb-3 border-b">
                     {/* Timer */}
                     <div className="flex items-center space-x-2">
                         <label className="text-sm">Duration</label>
@@ -97,7 +94,7 @@ const AddQuestion = ({
                                 value={question.time_limit}
                                 name="time_limit"
                                 id="time_limit"
-                                className="block w-28 px-2 py-1  bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-primary-400 focus:border-primary-400"
+                                className="block w-28 px-2.5 py-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-400 focus:border-primary-400"
                                 placeholder="3"
                                 required
                             />
@@ -111,7 +108,7 @@ const AddQuestion = ({
                     <div className="flex flex-wrap items-center gap-2">
                         <label className="text-sm">Answer Format</label>
                         <Select
-                            className="text-xs w-56 "
+                            className="text-sm w-56"
                             styles={selectStyle}
                             theme={selectTheme}
                             onChange={handleTypeChange}
@@ -123,7 +120,7 @@ const AddQuestion = ({
                 </div>
                 <button
                     type="submit"
-                    className="inline-flex mb-1 w-full justify-center items-center px-3 py-1 text-sm font-medium text-center text-white bg-brand-purple rounded-lg focus:ring-4 focus:ring-primary-200 hover:bg-primary-800"
+                    className="inline-flex w-full justify-center items-center px-5 py-2 text-sm font-medium text-center text-white bg-brand-purple rounded-lg focus:ring-4 focus:ring-primary-200 hover:bg-primary-800"
                 >
                     Add
                 </button>

@@ -1,65 +1,56 @@
-import { BellAlertIcon, CreditCardIcon, UserIcon, UsersIcon } from '@heroicons/react/24/outline';
-import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 function ProfileNavbar() {
-    const [currentTab, setCurrentTab] = useState()
-    const location = useLocation();
-    useEffect(() => {
-        const paths = location.pathname.split('/')
-        if(paths[paths.length - 2] === "profile") {
-            setCurrentTab('personal-info')
-        }
-        else setCurrentTab(paths[paths.length - 2])
-
-    }, [location])
-
-
-    const tabs = [
-        {
-            value: "personal-info",
-            icon: <UserIcon className={`w-5 h-5 text-gray-500 group-hover:text-indigo-400 ${currentTab === "personal-info" ? "text-indigo-500" : "text-gray-400"}`} />,
-            label: "Account Info"
-        },
-        {
-            value: "users",
-            icon: <UsersIcon className={`w-5 h-5 text-gray-500 group-hover:text-indigo-400 ${currentTab === "users" ? "text-indigo-500" : "text-gray-400"}`} />,
-            label: "Users"
-        },
-        {
-            value: "notifications",
-            icon: <BellAlertIcon className={`w-5 h-5 text-gray-500 group-hover:text-indigo-400 ${currentTab === "notifications" ? "text-indigo-500" : "text-gray-400"}`} />,
-            label: "Notifications"
-        },
-        {
-            value: "credits",
-            icon: <CreditCardIcon className={`w-5 h-5 text-gray-500 group-hover:text-indigo-400 ${currentTab === "credits" ? "text-indigo-500" : "text-gray-400"}`} />,
-            label: "Payment and Billings"
-        },
-    ]
-
     return (
         <>
-            <div className="w-full py-5 text-sm bg-white text-black border-r quicksand" style={{ height: 'calc(100dvh - 57px)' }}>
+            <div className="min-w-1/6 py-5 bg-white text-black border-r quicksand" style={{ height: 'calc(100dvh - 57px)' }}>
                 <div className="w-full p-4 ps-8 pb-8 border-b">
                     <label className="font-bold text-xl leading-8 text-black">
-                        Manage your profile
+                        User profile management
                     </label>
                 </div>
-                <div className="w-full p-3 pb-4 mt-4 text-gray-400">
-                    <ul className='flex flex-col gap-1 w-full'>
-                        {tabs.map((tab) => (
-                            <NavLink to={`/app/user/profile/${tab.value}/`}
-                                className={
-                                    currentTab === tab.value
-                                        ? "w-full py-3 px-2 transition-all rounded-lg cursor-pointer flex gap-2 items-center ps-8 text-indigo-500 font-semibold bg-gray-50"
-                                        : "w-full py-3 px-2 transition-all rounded-lg cursor-pointer flex gap-2 group items-center text-gray-500 hover:text-indigo-400 ps-8 hover:font-semibold"}
-                            >
-                                <li className="flex gap-2 items-center hover:text-indigo-400 ">
-                                    {tab.icon}
-                                    {tab.label}
-                                </li></NavLink>
-                        ))}
+                <div className="w-full p-3 pb-4 mt-4 border-b text-gray-400">
+                    <ul className='gap-3'>
+                        <NavLink to="/app/user/profile/personalInfo/"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? "py-3 px-2 cursor-pointer flex gap-2 items-center hover:bg-gray-200 ps-8 text-gray-900 font-semibold bg-gray-200"
+                                    : "py-3 px-2 cursor-pointer flex gap-2 items-center hover:bg-gray-200 ps-8 hover:text-gray-900 hover:font-semibold"}
+                        >
+                            <li className="flex gap-2 items-center">
+                                <img src='https://img.icons8.com/?size=100&id=yAMJMOeU6sRi&format=png&color=000000' className='w-4 h-4 text-gray-400' />
+                                Personal Info
+                            </li></NavLink>
+                        <NavLink to="/app/user/profile/users/"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? "py-3 px-2 cursor-pointer flex gap-2 items-center hover:bg-gray-200 ps-8 text-gray-900 font-semibold bg-gray-200"
+                                    : "py-3 px-2 cursor-pointer flex gap-2 items-center hover:bg-gray-200 ps-8 hover:text-gray-900 hover:font-semibold"}
+                        >
+                            <li className="flex gap-2 items-center">
+                                <img src='https://img.icons8.com/?size=100&id=4XDFrFOD45Si&format=png&color=000000' className='w-4 h-4' />
+                                Users
+                            </li></NavLink>
+                        <NavLink to="/app/user/profile/notifications/"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? "py-3 px-2 cursor-pointer flex gap-2 items-center hover:bg-gray-200 ps-8 text-gray-900 font-semibold bg-gray-200"
+                                    : "py-3 px-2 cursor-pointer flex gap-2 items-center hover:bg-gray-200 ps-8 hover:text-gray-900 hover:font-semibold"}
+                        >
+                            <li className="flex gap-2 items-center">
+                                <img src='https://img.icons8.com/?size=100&id=RBe3oBdrzSHc&format=png&color=000000' className='w-4 h-4' />
+                                Notifications
+                            </li></NavLink>
+                        <NavLink to="/app/user/profile/credits/"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? "py-3 px-2 cursor-pointer flex gap-2 items-center hover:bg-gray-200 ps-8 text-gray-900 font-semibold bg-gray-200"
+                                    : "py-3 px-2 cursor-pointer flex gap-2 items-center hover:bg-gray-200 ps-8 hover:text-gray-900 hover:font-semibold"}
+                        >
+                            <li className="flex gap-2 items-center">
+                                <img src='https://img.icons8.com/?size=100&id=ki6m4RPyanUP&format=png&color=000000' className='w-4 h-4' />
+                                Credits
+                            </li></NavLink>
                     </ul>
                 </div>
             </div>

@@ -5,7 +5,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { api, maskNumber, selectStyle } from "../../constants/constants";
+import { maskNumber, selectStyle } from "../../constants/constants";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import UpdateStatusAndEmailModal from "./action-modals/UpdateStatusAndEmailModal";
 import Select from "react-select";
@@ -25,7 +25,6 @@ const ApplicantResume = ({
   const [showModal, setShowModal] = useState(false);
   const [showScoringInfo, setShowScoringInfo] = useState(true);
   const [answers, setAnswers] = useState([]);
-  const [criteriaResponses, setCriteriaResponses] = useState([]);
   const [isMasked, setIsMasked] = useState(true);
   const { applicantId, serviceId } = useParams();
 
@@ -63,7 +62,6 @@ const ApplicantResume = ({
   useEffect(() => {
     if (applicant && jobId) {
       fetchCandidateAnswers(applicant.id);
-      fetchCandidateCriteriaResponse();
     }
   }, [applicant, jobId]);
 
@@ -85,10 +83,11 @@ const ApplicantResume = ({
 
   async function fetchCandidateAnswers(applicantId) {
     // Define the URL for the API endpoint
-    const answerUrl = `${api}/interview/candidate/${applicantId}/job/${jobId}/service/${serviceId}/answers/`;
+    const answerUrl = `/interview/candidate/${applicantId}/job/${jobId}/service/${serviceId}/answers/`;
     try {
       const [answersResponse] = await Promise.all([
         fetch(answerUrl),
+        // fetch(`/personality-screening/detail/${applicantId}/`)
       ]);
 
       if (!answersResponse.ok) {
@@ -97,6 +96,7 @@ const ApplicantResume = ({
 
       const data = await answersResponse.json();
 
+      console.log(data?.results);
       if (data?.results?.length) {
         setAnswers(data.results);
         setAnswerMode((prev) => {
@@ -122,6 +122,7 @@ const ApplicantResume = ({
 
   const updateCandidateStatus = async (statusText, resumeDetail) => {
     setUpdatingStatus(true);
+    console.log("statusText : ", userDetails, statusText, resumeDetail);
 
     const payload = {
       status_text: statusText,
@@ -134,7 +135,7 @@ const ApplicantResume = ({
     if (resumeDetail?.id) {
       try {
         const response = await fetch(
-          `${api}/resume_parser/resumes/${resumeDetail?.id}/`,
+          `/resume_parser/resumes/${resumeDetail?.id}/`,
           {
             method: "PATCH",
             headers: {
@@ -148,6 +149,7 @@ const ApplicantResume = ({
         if (response.ok) {
           //console.log("successfully updated : ", data)
           if (data) {
+            console.log("data", data);
             setResumeDetail((prev) => ({
               ...prev,
               status_text: data.status_text,
@@ -155,6 +157,7 @@ const ApplicantResume = ({
             setStages((prev) =>
               prev.map((stage) => {
                 if (stage?.key === "resume-screening") {
+                  console.log(stage)
                   return {
                     ...stage,
                     completed: data["completed"] ?? false,
@@ -162,10 +165,10 @@ const ApplicantResume = ({
                     approved_by: data["approved_by"] ?? null,
                     updated_by: data["updated_by"] ?? null,
                     updated_at: data["updated_at"] || null,
-                    status_text: data["status_text"] ?? "",
+                    status_text : data["status_text"] ?? "",
                   };
-                } else {
-                  return stage;
+                }else{
+                  return stage
                 }
               })
             );
@@ -181,30 +184,6 @@ const ApplicantResume = ({
         setErrorMessage("An error occurred while updating status.");
         setUpdatingStatus(false);
       }
-    }
-  };
-
-  const fetchCandidateCriteriaResponse = async () => {
-    const answerUrl = `${api}/jobs/candidate-responses/?candidate_id=${applicant?.id}`;
-    try {
-      const response = await fetch(answerUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + String(authTokens.access),
-        },
-      });
-
-      if (!response.ok) {
-        throw setErrorMessage;
-      }
-
-      const data = await response.json();
-      setCriteriaResponses(data.results);
-      console.log("Criteria Response: ", data);
-    } catch (error) {
-      console.error("Error fetching criteria response:", error);
-      setErrorMessage("An error occurred while fetching criteria response.");
     }
   };
 
@@ -348,25 +327,58 @@ const ApplicantResume = ({
             <div className="mt-6 border-t border-gray-100">
               <dl className="divide-y divide-gray-100">
                 <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="font-medium leading-6 text-gray-900">
-                    Introduction Video
+                  <dt className=" font-medium leading-6 text-gray-900">
+                    Responses
                   </dt>
-                  <dd className="mt-1 leading-6 w-3/5 text-gray-700 sm:col-span-2 sm:mt-0">
-                    {resumeDetail?.introduction_video ? (
-                      <>
-                        <video
-                          src={resumeDetail.introduction_video}
-                          controls
-                          className="w-72 max-w-72 h-36 bg-black flex items-center rounded-xl shadow-lg ring-2 ring-gray-400"
-                        >
-                          Your browser does not support the video tag.
-                        </video>
-                      </>
-                    ) : (
-                      <span className="text-xs italic text-gray-500">
-                        No data
-                      </span>
-                    )}
+                  <dd className="mt-1  flex flex-col gap-3 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {/* <div className="mb-2">
+                          <dt className=" mb-1 flex font-semibold leading-6 text-gray-900">
+                            
+                          </dt>
+                          <dd className=" ms-3  leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                            <>
+                                <div className="flex p-2 gap-3 items-center border rounded-lg">
+                                  <div className="w-full h-full overflow-auto text-sky-700">
+                                  <TranscriptTimeline />
+                                  </div>
+                                </div>
+                            </>
+                          </dd>
+                        </div> */}
+                    
+                    {answers.length > 0 &&
+                      answers.map((answer) => (
+                        <div className="mb-2">
+                          <dt className=" mb-1 flex font-semibold leading-6 text-gray-900">
+                            {answer.question.text}{" "}
+                          </dt>
+                          <dd className=" ms-3  leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                            {/* <label className='mb-1 block text-sm font-semibold'>  {answer.type === "text" && answer.text} </label> */}
+
+                            <>
+                              {answer.type === "text" && answer.text}
+                              {answer.type === "audio" && (
+                                <div className="flex p-2 gap-3 items-center border rounded-lg">
+                                  {/* <button onClick={() => !audioURL[answer.id] && getAnswerMedia(answer.id, "audio")} className={`hover:bg-sky-200 h-8 p-1 rounded-md ${answerMode[answer.id] === "audio" && 'bg-sky-300'}`}><SpeakerWaveIcon className="w-5 h-5 " /></button> */}
+
+                                  {/* {
+                                                                    answerMode[answer.id] === "audio" && audioURL && */}
+                                  <div className="w-full h-full overflow-auto text-sky-700">
+                                    <audio
+                                      className="h-8"
+                                      controls
+                                      ref={audioRef}
+                                      src={answer?.audio_file}
+                                      type="audio/wav"
+                                    />
+                                  </div>
+                                  {/* } */}
+                                </div>
+                              )}
+                            </>
+                          </dd>
+                        </div>
+                      ))}
                   </dd>
                 </div>
                 <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -374,7 +386,7 @@ const ApplicantResume = ({
                     Relevant Experience
                   </dt>
                   <dd className="mt-1  leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                    {resumeDetail?.relevant_experience_in_months ? (
+                    {resumeDetail.relevant_experience_in_months ? (
                       <>
                         {resumeDetail.relevant_experience_in_months}
                         <span className="text-sm italic text-gray-500 mx-1">
@@ -393,7 +405,7 @@ const ApplicantResume = ({
                     Expected Annual Salary{" "}
                   </dt>
                   <dd className="mt-1  leading-6 text-gray-700 sm:col-span-2 sm:mt-0 flex items-center">
-                    {resumeDetail?.expected_ctc ? (
+                    {resumeDetail.expected_ctc ? (
                       isMasked ? (
                         maskNumber(resumeDetail.expected_ctc?.toLocaleString())
                       ) : (
@@ -418,203 +430,64 @@ const ApplicantResume = ({
                 </div>
                 <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                   <dt className=" font-medium leading-6 text-gray-900">
-                    Screening Responses
-                  </dt>
-                  <dd className="mt-1  flex flex-col gap-3 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                    {/* <div className="mb-2">
-                          <dt className=" mb-1 flex font-semibold leading-6 text-gray-900">
-                            
-                          </dt>
-                          <dd className=" ms-3  leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            <>
-                                <div className="flex p-2 gap-3 items-center border rounded-lg">
-                                  <div className="w-full h-full overflow-auto text-sky-700">
-                                  <TranscriptTimeline />
-                                  </div>
-                                </div>
-                            </>
-                          </dd>
-                        </div> */}
-
-                    {answers.length > 0 &&
-                      answers.map((answer) => (
-                        <div className="mb-2">
-                          <dt className=" mb-1 flex font-semibold leading-6 text-gray-900">
-                            {answer.question.text}{" "}
-                          </dt>
-                          <dd className=" ms-3  leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            {/* <label className='mb-1 block text-sm font-semibold'>  {answer.type === "text" && answer.text} </label> */}
-
-                            <>
-                              {answer.type === "text" && answer.text}
-                              {answer.type === "audio" && (
-                                <div className="flex p-2 gap-3 items-center border rounded-lg">
-                                  {/* <button onClick={() => !audioURL[answer.id] && getAnswerMedia(answer.id, "audio")} className={`hover:bg-sky-200 h-8 p-1 rounded-md ${answerMode[answer.id] === "audio" && 'bg-sky-300'}`}><SpeakerWaveIcon className="w-5 h-5 " /></button> */}
-
-                                  {/* {
-                                                                    answerMode[answer.id] === "audio" && audioURL && */}
-                                  <div className="w-full h-full overflow-auto text-sky-700">
-                                    <audio
-                                      className="h-8 bg-transparent"
-                                      controls
-                                      ref={audioRef}
-                                      src={answer?.audio_file}
-                                      type="audio/wav"
-                                    />
-                                  </div>
-                                  {/* } */}
-                                </div>
-                              )}
-                            </>
-                          </dd>
-                        </div>
-                      ))}
-                  </dd>
-                </div>
-                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className=" font-medium leading-6 text-gray-900">
-                    Criteria Responses
-                  </dt>
-                  <dd className="mt-1 leading-6 flex flex-col gap-4 text-gray-700 sm:col-span-1 sm:mt-0">
-                    {criteriaResponses.length > 0 ? (
-                      criteriaResponses.map((r, index) => (
-                        <div
-                          key={r.id}
-                          className="p-5 border border-gray-200 rounded-lg shadow-sm bg-gray-50 hover:shadow-md transition-shadow duration-300"
-                        >
-                          <div className="flex items-start">
-                            {/* Icon */}
-                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 mr-4">
-                              <i className="fa-solid fa-clipboard-question"></i>
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1">
-                              {/* Question */}
-                              <div className="mb-2">
-                                <h3 className="text-base font-semibold text-gray-800">
-                                  {r.criteria.question || "No question found"}
-                                </h3>
-                              </div>
-
-                              {/* Response */}
-                              <div className="mt-2 flex justify-between items-center text-sm">
-                                <span className="text-gray-600">Response:</span>
-                                <span className="font-medium text-gray-900">
-                                  {r.response || "No response available"}
-                                </span>
-                              </div>
-
-                              {/* Expected */}
-                              {r.criteria?.expected_response && (
-                                <div className="mt-2 flex justify-between items-center text-sm">
-                                  <span className="text-gray-600">
-                                    Expected:
-                                  </span>
-                                  <span className="font-medium text-blue-600">
-                                    {r.criteria.expected_response ||
-                                      "Expected not available"}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-500">
-                        No criteria responses available.
-                      </p>
-                    )}
-                  </dd>
-                </div>
-
-                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className=" font-medium leading-6 text-gray-900">
                     Skills
                   </dt>
                   {resumeDetail?.skills?.length > 0 ? (
-                    <dd className="mt-1 flex flex-wrap items-center leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                      {resumeDetail.skills
-                        .sort((a, b) => {
-                          // Extract skill names for comparison
-                          const aName =
-                            typeof a === "object" && a !== null
-                              ? a.name || ""
-                              : a;
-                          const bName =
-                            typeof b === "object" && b !== null
-                              ? b.name || ""
-                              : b;
-
-                          const isAMatched = resumeDetail.skills_matched.some(
-                            (s) => s.name === aName
-                          );
-                          const isBMatched = resumeDetail.skills_matched.some(
-                            (s) => s.name === bName
-                          );
-
-                          // Place matched skills first
-                          return isBMatched - isAMatched;
-                        })
-                        .map((skill, index) => {
-                          const skillName =
-                            typeof skill === "object" && skill !== null
-                              ? skill.name || ""
-                              : skill;
-                          const relevant =
-                            typeof skill === "object" && skill !== null
-                              ? skill.relevance || ""
-                              : null;
-
-                          // Check if skill is matched
-                          const isMatched = resumeDetail.skills_matched.some(
-                            (s) => s.name === skillName
-                          );
-
-                          return isMatched ? (
-                            <span
-                              title={skill}
-                              key={index}
-                              className={`cursor-default flex h-10 items-center rounded-md me-2 mb-2 px-2 py-1 text-xs font-medium  text-indigo-500 ring-2 ring-inset ring-indigo-700/50`}
-                            >
-                              <span className="truncate inline-flex items-center justify-start gap-1">
-                                <HandThumbUpIcon className="h-5 w-5 flex-shrink-0 brand-text" />
-                                <CheckBadgeIcon className="h-5 w-5 flex-shrink-0 brand-text" />
-                                {skillName}
-                              </span>
+                    <dd className="mt-1 flex flex-wrap items-center  leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                      {resumeDetail.skills.map((skill, index) => {
+                        const skillName =
+                          typeof skill === "object" && skill !== null
+                            ? skill.name || ""
+                            : skill;
+                        const relevant =
+                          typeof skill === "object" && skill !== null
+                            ? skill.relevance || ""
+                            : null;
+                        return resumeDetail.skills_matched.some(
+                          (s) => s.name === skillName
+                        ) ? (
+                          <span
+                            title={skill}
+                            key={index}
+                            className={`cursor-default flex h-10 items-center rounded-md me-2 mb-2 px-2 py-1 text-xs font-medium  text-indigo-500 ring-2 ring-inset ring-indigo-700/50 `}
+                          >
+                            <span className=" truncate inline-flex items-center justify-start gap-1">
+                              <HandThumbUpIcon className=" h-5 w-5 flex-shrink-0 brand-text" />{" "}
+                              <CheckBadgeIcon className=" h-5 w-5 flex-shrink-0 brand-text" />{" "}
+                              {skillName}
                             </span>
-                          ) : (
-                            <span
-                              title={skill}
-                              key={index}
-                              className={`cursor-default flex h-10 items-center rounded-md me-2 mb-2 pe-2 ps-3 py-1 text-xs font-medium ${
-                                relevant
-                                  ? "text-sky-700 ring-2 ring-inset ring-sky-700/10"
-                                  : "bg-gray-50 text-gray-700 ring-2 ring-inset ring-gray-700/10"
-                              }`}
-                            >
-                              <span className="truncate inline-flex items-center justify-start gap-1">
-                                {(relevant === "high" ||
-                                  relevant === "medium") && (
-                                  <CheckBadgeIcon
-                                    className={`mx-1.5 h-5 w-5 flex-shrink-0 ${
-                                      (relevant === "high" ||
-                                        relevant === true) &&
-                                      "brand-text"
-                                    } ${
-                                      relevant === "medium" && "text-blue-400"
-                                    }`}
-                                  />
-                                )}
-                                {skillName}
-                              </span>
+                          </span>
+                        ) : (
+                          <span
+                            title={skill}
+                            key={index}
+                            className={`cursor-default flex h-10  items-center rounded-md me-2 mb-2 pe-2 ps-3 py-1 text-xs font-medium ${
+                              relevant
+                                ? " text-sky-700 ring-2 ring-inset ring-sky-700/10 "
+                                : "bg-gray-50 text-gray-700 ring-2 ring-inset ring-gray-700/10 "
+                            }`}
+                          >
+                            <span className=" truncate inline-flex items-center justify-start gap-1">
+                              {(relevant === "high" ||
+                                relevant === "medium") && (
+                                <CheckBadgeIcon
+                                  className={`mx-1.5 h-5 w-5 flex-shrink-0 ${
+                                    (relevant === "high" ||
+                                      relevant === true) &&
+                                    "brand-text"
+                                  } ${
+                                    relevant === "medium" && "text-blue-400"
+                                  }`}
+                                />
+                              )}
+                              {skillName}
                             </span>
-                          );
-                        })}
+                          </span>
+                        );
+                      })}
                     </dd>
                   ) : (
-                    <dd className="text-gray-500 text-sm">
+                    <dd className="text-gray-500">
                       Could not extract skills or not found
                     </dd>
                   )}
@@ -814,7 +687,7 @@ const ApplicantResume = ({
 
       {showModal && (
         <UpdateStatusAndEmailModal
-          setStages={setStages}
+        setStages={setStages}
           setStatus={setSelectedStatus}
           status={selectedStatus?.value}
           setShowModal={setShowModal}

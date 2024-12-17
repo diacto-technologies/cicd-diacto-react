@@ -9,10 +9,7 @@ const TestLogCompleted = () => {
     "201": "The test has been submitted due to a reload",
     "202": "Frequent full-screen exits have led to your disqualification",
     "203": "Frequent tab changes have led to your disqualification",
-    "204": "Assessment Already Submitted",
   }
-
-  if(localStorage.getItem("proctor")) localStorage.removeItem('proctor');
   return (
     <>
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-[#7474f4] to-[#a5a5fa] px-6 py-12 relative overflow-hidden">

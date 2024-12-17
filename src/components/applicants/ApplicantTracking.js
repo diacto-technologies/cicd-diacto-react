@@ -5,10 +5,10 @@ import { useParams } from "react-router-dom";
 import ReactSelect from "react-select";
 import AuthContext from "../../context/AuthContext";
 import { CheckCircleIcon, MinusCircleIcon } from "@heroicons/react/24/outline";
-import { api, selectStyle } from "../../constants/constants";
+import { selectStyle } from "../../constants/constants";
 import Select from "react-select";
 
-const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
+const ApplicantTracking = ({setStages, jobId, jobTitle }) => {
   const { authTokens, userDetails } = useContext(AuthContext);
   const { applicantId } = useParams();
 
@@ -37,7 +37,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
   const [testQuestions, setTestQuestions] = useState([]);
   const [questionsNextPage, setQuestionsNextPage] = useState(null);
   const [answersNextPage, setAnswersNextPage] = useState(null);
-  const [totalQuestionsByTest, setTotalQuestionsByTest] = useState(0);
+
   const [resumeScreeningStatuses, SetResumeScreeningStatuses] = useState([
     {
       label: "Shortlisted",
@@ -66,40 +66,35 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
   useEffect(() => {
     if (selectedTest) {
       // console.log('attempted',selectedTest?.total_question?.length,selectedTest)
-      fetchCandidateAnswers(
-        null,
-        selectedTestLog?.id,
-        selectedTest?.type,
-        selectedTest?.id,
-        answersNextPage
-      );
+      fetchTestQuestion(selectedTest?.id, selectedTest?.type);
     }
   }, [selectedTest]);
 
-  // useEffect(() => {
-  //   if (testQuestions) {
-  //     // console.log('test question',testQuestions.flatMap((q)=>q.id))
+  useEffect(() => {
+    if (testQuestions) {
+      // console.log('test question',testQuestions.flatMap((q)=>q.id))
 
-  //     const questionIds = testQuestions.flatMap((q) => q.id) || [];
-  //     //   console.log(questionIds)
-  //     if (questionIds.length > 0) {
-  //       fetchCandidateAnswers(
-  //         questionIds,
-  //         selectedTestLog?.id,
-  //         selectedTest?.type,
-  //         selectedTest?.id,
-  //         answersNextPage
-  //       );
-  //     }
-  //   }
-  // }, [testQuestions]);
+      const questionIds = testQuestions.flatMap((q) => q.id) || [];
+      //   console.log(questionIds)
+      if (questionIds.length > 0) {
+        fetchCandidateAnswers(
+          questionIds,
+          selectedTestLog?.id,
+          selectedTest?.type,
+          selectedTest?.id,
+          answersNextPage
+        );
+      }
+    }
+  }, [testQuestions]);
   // Runs when a test group is selected
   useEffect(() => {
     if (selectedTestLog) {
-      setSelectedStatus(null);
+      setSelectedStatus(null)
       setTestQuestions([]);
       setAnswersNextPage(null);
       setQuestionsNextPage(null);
+      console.log(selectedTestLog);
       updateProgress(selectedTestLog);
       const tests =
         (selectedTestLog?.test.length &&
@@ -130,6 +125,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
         );
         fetchTestStatus(selectedTestLog?.id);
       }
+      setTotalQuestions(questionsTotal);
 
       setStatusText(selectedTestLog?.status_text);
     }
@@ -137,9 +133,9 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
 
   useEffect(() => {
     if (selectedStatus) {
-      updateStatus(selectedStatus.label);
+      updateStatus(selectedStatus.label)
     }
-  }, [selectedStatus]);
+  },[selectedStatus])
 
   // Calculate Correct Count
 
@@ -175,7 +171,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
     setLoadingTestLog(true);
     try {
       const response = await fetch(
-        `${api}/test/testlog-for-report/?job_id=${jobId}&candidate_id=${applicantId}`,
+        `/test/testlog-for-report/?job_id=${jobId}&candidate_id=${applicantId}`,
         {
           method: "GET",
           headers: {
@@ -235,7 +231,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
     setLoadingResults(true);
     try {
       const response = await fetch(
-        `${api}/test/result/?candidate_id=${applicantId}&test_log_id=${testLogId}&test_id=${testId}`,
+        `/test/result/?candidate_id=${applicantId}&test_log_id=${testLogId}&test_id=${testId}`,
         {
           method: "GET",
           headers: {
@@ -267,7 +263,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
   async function fetchTestStatus(testLogId) {
     setLoadingTestStatus(true);
     try {
-      const response = await fetch(`${api}/test/test-status/?test_log=${testLogId}`, {
+      const response = await fetch(`/test/test-status/?test_log=${testLogId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -278,21 +274,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-
       setTestStatusData(data);
-      const totalQuestions = data.reduce(
-        (sum, s) => sum + parseInt(s.question_count || 0, 10),
-        0
-      );
-      const questionCountByTest = {};
-      data.forEach((t) => {
-        if (t.test || t.prebuilt_assessment) {
-          questionCountByTest[t.test || t.prebuilt_assessment] =
-            t.question_count;
-        }
-      });
-      setTotalQuestionsByTest(questionCountByTest);
-      setTotalQuestions(totalQuestions);
       setLoadingTestStatus(false);
     } catch (error) {
       console.error(error);
@@ -302,7 +284,42 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
       setLoadingTestStatus(false);
     }
   }
-  
+  async function fetchTestQuestion(testId, assessmentType, pageUrl = null) {
+    setLoadingQuestions(true);
+    try {
+      const url = pageUrl
+        ? pageUrl
+        : `/test/questions/?test_id=${testId}&type=${assessmentType}`;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + String(authTokens.access),
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      // console.log(data,'test question')
+      setTestQuestions((previousQuestions) => [
+        ...previousQuestions,
+        ...data.results,
+      ]);
+      setQuestionsNextPage(data.next);
+      // setPreviousPage(data.previous);
+      setLoadingQuestions(false);
+    } catch (error) {
+      console.error(error);
+      setLoadingQuestions(false);
+
+      setError(error.message);
+    } finally {
+      setLoadingQuestions(false);
+    }
+  }
+  // console.log(testQuestions,'questions')
+  // Fetch Candidate Answers
   async function fetchCandidateAnswers(
     questionIds,
     testLogId,
@@ -317,7 +334,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
       const response = await fetch(
         pageUrl
           ? pageUrl
-          : `${api}/test/answers/?candidate_id=${applicantId}&job_id=${jobId}&test_log_id=${testLogId}&test_id=${testId}&type=${assessmentType}`,
+          : `/test/answers/?candidate_id=${applicantId}&job_id=${jobId}&test_log_id=${testLogId}&test_id=${testId}&type=${assessmentType}`,
         {
           method: "GET",
           headers: {
@@ -420,12 +437,12 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
 
   // Handle Shortlist Action
   async function updateStatus(status_text) {
-    setUpdatingStatus(true);
+    setUpdatingStatus(true)
     const testLogId = selectedTestLog?.id;
     const payload = {
       status_text: status_text,
       updated_by: userDetails?.id,
-      updated_at: new Date(),
+      updated_at : new Date()
     };
 
     if (status_text && status_text === "Shortlisted") {
@@ -440,7 +457,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
     }
 
     try {
-      const response = await fetch(`${api}/test/testlog/${testLogId}/`, {
+      const response = await fetch(`/test/testlog/${testLogId}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -467,6 +484,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
         setStages((prev) =>
           prev.map((stage) => {
             if (stage?.key === "assessment") {
+              console.log(stage)
               return {
                 ...stage,
                 completed: data["completed"] ?? false,
@@ -474,19 +492,20 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                 approved_by: data["approved_by"] ?? null,
                 updated_by: data["updated_by"] ?? null,
                 updated_at: data["updated_at"] || null,
-                status_text: data["status_text"] ?? "",
+                status_text : data["status_text"] ?? "",
               };
-            } else {
-              return stage;
+            }else{
+              return stage
             }
           })
         );
-        setUpdatingStatus(false);
+        setUpdatingStatus(false)
       }
     } catch (error) {
       console.error(error);
       setError(error.message);
-      setUpdatingStatus(false);
+      setUpdatingStatus(false)
+
     }
   }
 
@@ -523,9 +542,9 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
     let baseClasses = "inline-block px-4 py-2 rounded-lg";
 
     if (choice.correct && isChoiceSelected) {
-      return `${baseClasses} bg-emerald-500 text-white font-semibold`; // Correct and selected
+      return `${baseClasses} bg-green-500 text-white font-semibold`; // Correct and selected
     } else if (choice.correct) {
-      return `${baseClasses} bg-emerald-100 text-emerald-800 font-semibold`; // Correct but not selected
+      return `${baseClasses} bg-green-100 text-green-800 font-semibold`; // Correct but not selected
     } else if (isChoiceSelected) {
       return `${baseClasses} bg-red-100 text-red-800 font-semibold`; // Selected but incorrect
     }
@@ -536,14 +555,11 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
   // console.log(selectedTest,candidateAnswers,'details')
 
   const loadNextPage = () => {
-    if (answersNextPage) {
-     
-      fetchCandidateAnswers(
-        null,
-        selectedTestLog?.id,
-        selectedTest?.type,
+    if (questionsNextPage) {
+      fetchTestQuestion(
         selectedTest?.id,
-        answersNextPage
+        selectedTest?.type,
+        questionsNextPage
       );
       // fetchCandidateAnswers(testQuestions[0],selectedTestLog.id,selectedTest.type,selectedTest.id,answersNextPage)
     }
@@ -553,8 +569,6 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
   //     fetchTestQuestion(selectedTest?.id, selectedTest?.type, previousPage); // Pass the previousPage URL
   //   }
   // };
-
-
   return (
     <>
       {!loadingTestLog ? (
@@ -604,26 +618,21 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                 <div className="flex items-center gap-2">
                   <label
                     className={`flex bg-blue-50 ring-1 me-3 my-2 px-3 py-1 rounded-lg font-normal
-                      ${
-                        selectedTestLog?.status_text === "Under Review" &&
+                      ${selectedTestLog?.status_text === "Under Review" &&
                         "bg-yellow-50 text-yellow-700 ring-yellow-700/40"
-                      }
-                        ${
-                          selectedTestLog?.status_text === "Shortlisted" &&
-                          "bg-green-50 text-green-700 ring-green-700/40"
-                        }
-                        ${
-                          selectedTestLog?.status_text === "Not Shortlisted" &&
-                          "bg-red-50 text-red-700 ring-red-700/40"
-                        }
-                        ${
-                          selectedTestLog?.status_text === "On Hold" &&
-                          "bg-orange-50 text-orange-700 ring-orange-700/40"
-                        }
-                        ${
-                          selectedTestLog?.status_text === "Completed" &&
-                          "bg-green-50 text-green-700 ring-green-700/40"
-                        }
+                       }
+                        ${selectedTestLog?.status_text === "Shortlisted" &&
+                        "bg-green-50 text-green-700 ring-green-700/40"
+                       }
+                        ${selectedTestLog?.status_text === "Not Shortlisted" &&
+                        "bg-red-50 text-red-700 ring-red-700/40"
+                       }
+                        ${selectedTestLog?.status_text === "On Hold" &&
+                        "bg-orange-50 text-orange-700 ring-orange-700/40"
+                       }
+                        ${selectedTestLog?.status_text === "Completed" &&
+                        "bg-green-50 text-green-700 ring-green-700/40"
+                       }
             `}
                   >
                     Status :{" "}
@@ -643,11 +652,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                       setSelectedStatus(selectedOption)
                     }
                     options={resumeScreeningStatuses}
-                    placeholder={
-                      selectedTestLog?.completed
-                        ? "Mark as"
-                        : "Not Completed Yet"
-                    }
+                    placeholder={ selectedTestLog?.completed ? "Mark as" : "Not Completed Yet"}
                   />
                 </div>
               </div>
@@ -733,7 +738,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                     </p>
                   </h3>
                   {!loadingResults ? (
-                    <div className="transition-all flex flex-wrap gap-3 mb-3 px-10 border-b  p-4 ">
+                    <div className="transition-all mb-3 px-10 border-b  p-4 bg-white ">
                       {testData.map((test) => {
                         const isSelected = selectedTest?.id === test.id;
                         const correctAnswers =
@@ -742,40 +747,37 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                               result.test === test.id ||
                               result.prebuilt_assessment === test.id
                           )?.correct_answer_count || 0;
+
+                        const totalQuestions = test?.total_question || 0;
                         const correctPercent =
                           totalQuestions > 0
-                            ? (correctAnswers / totalQuestionsByTest[test.id]) *
-                              100
+                            ? (correctAnswers / totalQuestions) * 100
                             : 0;
                         return (
                           <div
                             key={test.id}
-                            className={`flex flex-col gap-3 items-center mb-3 justify-center w-96 p-4 bg-white  rounded-lg shadow-lg transition-all duration-300 cursor-pointer hover:bg-gray-100 ${
-                              isSelected
-                                ? "border-2 border-blue-500"
-                                : "border border-gray-200"
+                            className={`flex items-center mb-3 justify-between w-full p-4 bg-white rounded-lg shadow-lg transition-all duration-300 cursor-pointer hover:bg-gray-100 ${
+                              isSelected ? "border-2 border-blue-500" : ""
                             }`}
                             onClick={() => handleTestClick(test)}
                           >
-                            <div className="flex w-full items-center ">
-                              <label className="text-gray-700 font-medium text-ellipsis ">
+                            <div className="flex items-center space-x-2 w-1/6">
+                              <span className="text-gray-700 font-medium">
                                 {test.title}
-                              </label>
+                              </span>
                             </div>
                             {/* Progress Bar Section */}
-                            <div className="relative flex gap-3 items-center w-full me-2">
-                              <div className="relative w-full bg-gray-200 h-5 rounded-full overflow-hidden">
+                            <div className="relative w-2/3">
+                              <div className="relative w-full bg-gray-200 h-6 rounded-full overflow-hidden">
                                 {/* Correct Portion */}
                                 <div
-                                  className="absolute top-0 left-0 h-full bg-emerald-400 flex justify-center items-center text-white text-sm font-medium"
+                                  className="absolute top-0 left-0 h-full bg-green-400 flex justify-center items-center text-white text-sm font-medium"
                                   style={{ width: `${correctPercent}%` }}
                                 >
                                   {correctAnswers}
                                 </div>
                                 {/* Incorrect Portion */}
-                                {totalQuestionsByTest[test.id] -
-                                  correctAnswers >
-                                  0 && (
+                                {totalQuestions - correctAnswers > 0 && (
                                   <div
                                     className="absolute top-0 left-0 h-full bg-red-400 flex justify-center items-center text-white text-sm font-medium"
                                     style={{
@@ -783,31 +785,20 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                                       marginLeft: `${correctPercent}%`,
                                     }}
                                   >
-                                    {totalQuestionsByTest[test.id] -
-                                      correctAnswers}
+                                    {totalQuestions - correctAnswers}
                                   </div>
                                 )}
                               </div>
-                              <div className="flex items-end justify-end w-1/3 gap-1">
-                               
-                                <span className="text-indigo-700 text-2xl font-semibold  me-2">
-                                  {testResults.find(
-                                    (r) =>
-                                      r.test === test.id ||
-                                      r.prebuilt_assessment === test.id
-                                  )?.score
-                                    ? `${
-                                        testResults.find(
-                                          (r) =>
-                                            r.test === test.id ||
-                                            r.prebuilt_assessment === test.id
-                                        )?.score
-                                      }%`
-                                    : "NA"}
-                                </span>
-                              </div>
                             </div>
                             {/* Stats Section */}
+                            <div className="flex items-center justify-end w-1/6 space-x-4">
+                              <span className="text-gray-700 font-medium text-lg">
+                                {correctPercent.toFixed(0)}%
+                              </span>
+                              <span className="text-gray-500 text-sm">
+                                {correctAnswers}/{totalQuestions}
+                              </span>
+                            </div>
                           </div>
                         );
                       })}
@@ -840,12 +831,12 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                           </p>
                         </div>
 
-                        {/* <label className="text-gray-700 ">
+                        <label className="text-gray-700 ">
                           <span className="text-2xl">
                             {candidateScore || 0}
                           </span>{" "}
                           / 100%
-                        </label> */}
+                        </label>
                       </div>
                       <div className="flex p-3 items-center justify-between gap-2 rounded-md border border-gray-200">
                         <div>
@@ -854,10 +845,10 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                             <strong className="text-lg">
                               {parseFloat(candidateTime || 0).toFixed(2) || 0}
                             </strong>{" "}
-                            {/* /{" "}
+                            /{" "}
                             {(
                               parseInt(selectedTest?.time_duration) / 60
-                            )?.toFixed(2)}{" "} */}
+                            )?.toFixed(2)}{" "}
                             mins
                           </span>
                         </div>
@@ -866,7 +857,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                           <label className=" ml-auto italic">
                             attempted{" "}
                             <strong className="text-gray-600 text-base font-normal ">
-                              {totalQuestionsByTest[selectedTest?.id]}{" "}
+                              {selectedTest?.total_question}{" "}
                             </strong>
                           </label>
                           <label className=" ml-auto italic">
@@ -878,46 +869,43 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                         </div>
                       </div>
                       <div className="flex flex-col gap-5 mt-3">
-                        {candidateAnswers?.map((res,index) => {
-                          const parsedChoices = JSON.parse(
-                            res.question?.choices
+                        {testQuestions?.map((question) => {
+                          const parsedChoices = JSON.parse(question.choices);
+                          const candidateAnswer = candidateAnswers?.find(
+                            (ans) => ans.question === question.id
                           );
-                          // const candidateAnswer = candidateAnswers?.find(
-                          //   (ans) => ans.question === question.id
-                          // );
+
                           return (
                             <li
-                              key={index}
+                              key={question.id}
                               className={`flex flex-col p-4 bg-white rounded-lg shadow-md border border-gray-300 ${
                                 loadingQuestions && "animate-pulse w-full"
                               }`}
                             >
                               <div className="flex w-full justify-between items-center mb-4">
                                 <span className="font-medium">
-                                  {res.question?.text}
+                                  {question.text}
                                 </span>
                                 <div className="flex items-center gap-3">
                                   <span>
-                                    {res?.duration || 0} /{" "}
-                                    {res.question.time_limit} secs
+                                    {candidateAnswer?.duration || 0} /{" "}
+                                    {question.time_limit} secs
                                   </span>
                                   <span className="font-light px-2 py-1 rounded-md bg-blue-950 text-white">
                                     {getDifficultyIcon(
-                                      res.question?.difficulty?.difficulty
+                                      question?.difficulty?.difficulty
                                     )}
-                                    {res.question?.difficulty?.difficulty}
+                                    {question?.difficulty?.difficulty}
                                   </span>
                                 </div>
                               </div>
 
                               <div className="flex flex-wrap gap-2">
-                                {(res.question.type.toLowerCase() ===
-                                  "single" ||
-                                  res.question.type.toLowerCase() ===
-                                    "multiple") &&
+                                {(question.type.toLowerCase() === "single" ||
+                                  question.type.toLowerCase() === "multiple") &&
                                   parsedChoices.map((choice, idx) => {
                                     const isChoiceSelected =
-                                      res?.selected_choice?.some(
+                                      candidateAnswer?.selected_choice?.some(
                                         (selected) =>
                                           selected.value === choice.value
                                       );
@@ -932,25 +920,24 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                                       </span>
                                     );
                                   })}
-                                {(res.question.type.toLowerCase() ===
-                                  "single" ||
-                                  res.question.type.toLowerCase() ===
-                                    "multiple") &&
-                                  res?.selected_choice?.length === 0 && (
+                                {(question.type.toLowerCase() === "single" ||
+                                  question.type.toLowerCase() === "multiple") &&
+                                  candidateAnswer?.selected_choice?.length ===
+                                    0 && (
                                     <span className="w-full text-red-500">
                                       No answer was selected.
                                     </span>
                                   )}
-                                {res.question?.type.toLowerCase() ===
-                                  "text" && (
+                                {question?.type.toLowerCase() === "text" && (
                                   <span
                                     className={`${
-                                      res?.text
+                                      candidateAnswer?.text
                                         ? "bg-teal-50/70 ring-green-200/80"
                                         : "bg-red-50/70 ring-red-200/80"
                                     }  ring-2  rounded-md p-3 w-1/2`}
                                   >
-                                    {res?.text || "No response available"}
+                                    {candidateAnswer?.text ||
+                                      "No response available"}
                                   </span>
                                 )}
                               </div>
@@ -961,7 +948,7 @@ const ApplicantTracking = ({ setStages, jobId, jobTitle }) => {
                           {/* {previousPage && (
                           <button onClick={loadPreviousPage}>Load Previous Questions</button>
                         )} */}
-                          {answersNextPage && (
+                          {questionsNextPage && (
                             <button onClick={loadNextPage}>
                               Load More Questions
                             </button>

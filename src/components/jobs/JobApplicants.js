@@ -5,16 +5,12 @@ import ApplicantList from "../../utils/list/ApplicantList";
 import Switch from "../../utils/swtiches/Switch";
 import Select from "react-select";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { api, logFeature } from "../../constants/constants";
-import ApplicantByStages from "./ApplicantByStages";
+import { logFeature } from "../../constants/constants";
 
 const JobApplicants = () => {
   const [tableInstance, setTableInstance] = useState(null);
 
-
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStage,setSelectedStage] = useState("Applied")
-  
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [filterSearchTerm, setFilterSearchTerm] = useState({});
 
@@ -47,8 +43,6 @@ const JobApplicants = () => {
   const [selectedFilterGroupError, setSelectedFilterGroupError] = useState(null)
   const [tableRowCount, setTableRowCount] = useState("fetching")
 
-  const [url,setUrl] = useState(null) //&o=-resumes__created_at
-
   const [candidateFormData, setCandidateFormData] = useState({
     name: "",
     email: "",
@@ -59,70 +53,63 @@ const JobApplicants = () => {
     linkedin: "",
   });
 
-  const [stageFilters,setStageFilters] = useState([
-    {label : "Applied",count : 800, backgroundColor : "bg-blue-50",color : "text-blue-500"},
-    {label : "Resume Screening",count : 799, backgroundColor : "bg-blue-50",color : "text-blue-500"},
-    {label : "Assessments",count : 150, backgroundColor : "bg-blue-50",color : "text-blue-500"},
-    {label : "Automated Video Interview",count : 20, backgroundColor : "bg-blue-50",color : "text-blue-500"},
-    {label : "Scheduled Final Interview",count : 10, backgroundColor : "bg-blue-50",color : "text-blue-500"},
-    {label : "Hired",count : 3, backgroundColor : "bg-green-50",color : "text-green-500"},
-    {label : "Rejected",count : 120, backgroundColor : "bg-red-50",color : "text-red-500"},
-    {label : "On Hold",count : 70, backgroundColor : "bg-orange-50",color : "text-orange-500"}
-  ])
-  const [viewMode,setViewMode] = useState("tabular")
-
   const [candidateToEdit, setCandidateToEdit] = useState(null);
 
- 
+  const selectStyle = {
+    menu: (provided, state) => ({
+      ...provided,
+      zIndex: 9999, // Adjust the zIndex as needed
+    }),
+    dropdownIndicator: (styles) => ({
+      ...styles,
+      color: "black",
+      fontSize: "0px",
+    }),
+    indicatorSeparator: (styles) => ({
+      ...styles,
+      width: "0px",
+    }),
+    placeholder: (base) => ({
+      ...base,
+      fontSize: "1em",
+      fontWeight: 400,
+    }),
+  };
 
   useEffect(() => {
     // fetchApplicants()
     fetchFilterGroups();
     fetchJob();
-    fetchCandidatesByStages();
   }, []);
 
-  useEffect(() => {
-    let updatedUrl = `/filter/candidate/${jobId}/?applied_jobs__id__iexact=${jobId}&stage_name=${selectedStage}`
-    //  `/filter/candidate/${jobId}/?applied_jobs__id__iexact=${jobId}&stage_name=${selectedStage}&o=-latest_resume_created_at`
-    const scoreSort = `&o=-resumes__resume_score__overall_score`
-    const dateSort = `&o=-latest_resume_created_at`
-    if (checked) {
-      updatedUrl += scoreSort
-    }
-    else{
-      updatedUrl += dateSort
-    }
-    setUrl(updatedUrl)
-  },[selectedStage])
+  // useEffect(() => {
 
-  useEffect(() => {
+  //   if (checked && tableInstance) {
 
-    if (checked && tableInstance) {
+  //     tableInstance.setSort([{ column: "score", dir: "desc" }]);
+  //   } else {
+  //     if (tableInstance) {
+  //       tableInstance.setSort({ column: "created_at", dir: "desc" });
+  //     }
 
-      tableInstance.setSort([{ column: "score", dir: "desc" }]);
-    } else {
-      if (tableInstance) {
-        tableInstance.setSort({ column: "created_at", dir: "desc" });
-      }
+  //   }
 
-    }
-
-  }, [checked]);
+  // }, [checked]);
 
 
-  const fetchCandidatesByStages = async () => {
+  const fetchCandidates = async () => {
     try {
       //console.log("fetching ")
-      const response = await fetch(`${api}/jobs/${jobId}/stage-filters/`);
+      const response = await fetch(`/candidates/filter/?name=${searchTerm}`);
       if (!response.ok) {
         throw new Error("Failed to fetch candidates");
       }
       const data = await response.json();
       //console.log(data)
-      setStageFilters(data);
+      setApplicants(data.results);
+      tableInstance.setData(data.results);
     } catch (error) {
-      console.error("Error fetching stages:", error);
+      console.error("Error fetching candidates:", error);
     }
   };
 
@@ -141,7 +128,7 @@ const JobApplicants = () => {
     //console.log("fetching dataset")
     try {
       setJobLoading(true);
-      const response = await fetch(`${api}/jobs/job-detail/${jobId}/`, {
+      const response = await fetch(`/jobs/job-detail/${jobId}/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -166,7 +153,7 @@ const JobApplicants = () => {
   const fetchApplicants = async () => {
     try {
       setApplicantsLoading(true);
-      const response = await fetch(`${api}/candidates/candidates-for-job/${jobId}/`, {
+      const response = await fetch(`/candidates/candidates-for-job/${jobId}/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -197,7 +184,7 @@ const JobApplicants = () => {
     //console.log("fetching dataset")
     try {
       setFilterGroupLoading(true);
-      const response = await fetch(`${api}/jobs/filter-group/`, {
+      const response = await fetch(`/jobs/filter-group/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -269,21 +256,21 @@ const JobApplicants = () => {
     if (workExp.value) {
       if (workExp.operator === "=") {
         return {
-          selectedStage: 'number',
+          filterType: 'number',
           type: 'equal',
           filter: parseInt(workExp?.value)
         }
       }
       else if (workExp.operator === "<=") {
         return {
-          selectedStage: 'number',
+          filterType: 'number',
           type: 'lessThan',
           filter: parseInt(workExp?.value)
         }
       }
       else if (workExp.operator === ">=") {
         return {
-          selectedStage: 'number',
+          filterType: 'number',
           type: 'greaterThan',
           filter: parseInt(workExp?.value)
         }
@@ -316,7 +303,7 @@ const JobApplicants = () => {
   const check_email_exists = async () => {
     try {
       const response = await fetch(
-        `${api}/candidates/check-email/${jobDetail.id}/${candidateFormData.email}/`,
+        `/candidates/check-email/${jobDetail.id}/${candidateFormData.email}/`,
         {
           method: "GET",
           headers: {
@@ -357,7 +344,7 @@ const JobApplicants = () => {
         );
 
         if (!data.exists) {
-          const response = await fetch(`${api}/candidates/candidate/`, {
+          const response = await fetch("/candidates/candidate/", {
             method: "POST",
 
             body: formData,
@@ -415,7 +402,7 @@ const JobApplicants = () => {
         // formData.append('resume', candidateToEdit.resumes?.find(resume => ));
 
         const response = await fetch(
-          `${api}/candidates/candidate/${candidateToEdit.id}/`,
+          `/candidates/candidate/${candidateToEdit.id}/`,
           {
             method: "PUT",
             body: formData,
@@ -460,6 +447,86 @@ const JobApplicants = () => {
     });
   }
 
+  // const handleShortList = async (grid) => {
+  //   const candidate = grid.data;
+  //   //console.log("candidate row ", grid)
+  //   //console.log("candidate ", candidate)
+
+  //   try {
+  //     const response = await fetch("/interview/shortlist-candidate/", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: "Bearer " + String(authTokens.access),
+  //       },
+  //       body: JSON.stringify({
+  //         candidate_id: candidate.id,
+  //         job_id: jobId,
+  //         module_id: candidate.interview_module,
+  //         service: "Resume Screening",
+  //       }),
+  //     });
+  //     const data = await response.json();
+  //     if (response.ok) {
+  //       console.log("successfully updated : ", data?.candidate.interview_steps);
+  //       if (data) {
+  //         // grid.update(data.candidate);
+  //         const rowNode = grid?.api.getRowNode(grid?.node.id);
+  //         rowNode.setDataValue(
+  //           "interview_steps",
+  //           data?.candidate.interview_steps
+  //         );
+  //       }
+  //       // setMessage(data.message);
+  //     } else {
+  //       setError(data.error);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error completing resume screening:", error);
+  //     setError("An error occurred while completing resume screening.");
+  //   }
+  // };
+
+  // const handleUnshortList = async (statusText, stepId, grid) => {
+  //   const candidate = grid?.data;
+  //   //console.log("candidate row ", grid)
+  //   //console.log("candidate ", candidate)
+
+  //   try {
+  //     const response = await fetch("/interview/unshortlist-candidate/", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: "Bearer " + String(authTokens.access),
+  //       },
+  //       body: JSON.stringify({
+  //         status: statusText,
+  //         step_id: stepId,
+  //         candidate_id: candidate.id,
+  //         job_id: jobId,
+  //         module_id: candidate.interview_module,
+  //         service: "Resume Screening",
+  //       }),
+  //     });
+  //     const data = await response.json();
+  //     if (response.ok) {
+  //       //console.log("successfully updated : ", data)
+  //       if (data) {
+  //         const rowNode = grid?.api.getRowNode(grid?.node.id);
+  //         rowNode.setDataValue(
+  //           "interview_steps",
+  //           data?.candidate.interview_steps
+  //         );
+  //       }
+  //       // setMessage(data.message);
+  //     } else {
+  //       setError(data.error);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error completing resume screening:", error);
+  //     setError("An error occurred while completing resume screening.");
+  //   }
+  // };
 
   const updateStatus = async (statusText,rowData,  row, body, subject, notifyCandidate) => {
     console.log("statusText : ", userDetails, statusText, subject,body, notifyCandidate)
@@ -493,7 +560,7 @@ const JobApplicants = () => {
     if (resume) {
       row.update({ "resumes": [{ "status_text": "Updating" }] })
       try {
-        const response = await fetch(`${api}/resume_parser/resumes/${resume.id}/`, {
+        const response = await fetch(`/resume_parser/resumes/${resume.id}/`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -528,7 +595,28 @@ const JobApplicants = () => {
     }
   };
 
-  
+  // const handleSubmit = (event) => {
+  //     event.preventDefault();
+  //     const feedbackData = {
+  //         interview_step: interviewStep,
+  //         candidate,
+  //         user,
+  //         feedback,
+  //         rating: rating || null,
+  //         status,
+  //         anonymous
+  //     };
+
+  //     const request = feedbackId
+  //         ? axios.put(`/api/interview-step-feedback/${feedbackId}/`, feedbackData)
+  //         : axios.post('/api/interview-step-feedback/', feedbackData);
+
+  //     request.then(() => {
+  //         onSubmitSuccess();
+  //         setShowCommentBox(false);
+  //     })
+  //     .catch(error => console.error('Error saving feedback:', error));
+  // };
 
   return (
     <>
@@ -564,38 +652,11 @@ const JobApplicants = () => {
               </div>
             </div>
           </div>
-          <div className=" flex-col lg:flex lg:flex-row gap-3 lg:items-center lg:justify-between ">
-          {/* <div
-            className="w-full flex gap-x-4 justify-end p-2 mb-1"
-            style={{ fontSize: ".8rem" }}
-          >
-            <span className="flex items-center gap-x-1  text-gray-600 font-medium">
-              <div className={`w-2 h-2 rounded-full bg-gray-400`}></div>
-              Not Shortlisted
-            </span>
-            <span className="flex items-center gap-x-1  text-gray-600 font-medium">
-              <div className={`w-2 h-2 rounded-full bg-yellow-400`}></div>
-              In Progress
-            </span>
-            <span className="flex items-center gap-x-1  text-gray-600 font-medium">
-              <div className={`w-2 h-2 rounded-full bg-emerald-400`}></div>
-              Completed
-            </span>
-            <span className="flex items-center gap-x-1 text-gray-600 font-medium">
-              <div className={`w-2 h-2 rounded-full bg-blue-400`}></div>
-              Approved
-            </span>
-          </div> */}
-           <div className=" text-gray-600 rounded-md  items-center md:mb-0  hidden md:flex me-2 text-nowrap ">
+          <div className="ms-auto flex-col lg:flex lg:flex-row lg:items-center lg:justify-between ">
+            {/* <div className=" text-gray-600 rounded-md me-2 items-center md:mb-0 mb-2 hidden md:flex">
               <Switch checked={checked} setChecked={setChecked} />
               <label className="text-sm">AI Recommendation</label>
-            </div>
-            <div className="me-4 ms-1 h-7 border hidden lg:flex "></div>
-          <div className="w-full flex gap-x-4 justify-end items-center">
-          <button type="button" onClick={() => setViewMode("tabular")} className={`ring-2   hover:ring-blue-700 ${viewMode === "tabular" ? "ring-blue-600 text-blue-500" : "ring-gray-400"}   inline-flex  hover:text-blue-800 items-center rounded-md  px-3 py-2 text-xs font-semibold shadow-sm `}><i class="fa-solid fa-table mx-1"></i> Tabular</button>
-          <button type="button" onClick={() => setViewMode("stage")} className={` ring-2  hover:ring-blue-700 ${viewMode === "stage" ? "ring-blue-600 text-blue-500"  : "ring-gray-400"}  inline-flex  hover:text-blue-800 items-center rounded-md  px-3 py-2 text-xs font-semibold shadow-sm   `}><i class="fa-solid fa-timeline mx-1"></i>Stages</button>
-          </div>
-           
+            </div> */}
 
             {/* <div className="me-4 ms-1 h-7 border hidden lg:flex "></div> */}
 
@@ -628,15 +689,9 @@ const JobApplicants = () => {
           </div>
         </div>
 
-        <div className="flex w-full flex-col md:flex-row space-x-3 mb-2 items-start  p-1">
-          <div className="flex h-[4.5rem] w-full items-center justify-evenly mb-3  border border-gray-300 rounded-sm">
-            {stageFilters.map((stage,index) => (
-              <button type="button" onClick={() => setSelectedStage(stage.label)} className={`text-gray-700 ${selectedStage === stage.label && `border-l-4 border-blue-500  ${stage.backgroundColor} ${stage.color}`}   h-full w-full text-start ${(index < stageFilters.length -1) && 'border-r border-r-gray-200'}  px-3 py-2 text-sm text-nowrap`}>
-                <label className="block mb-1 font-medium">{stage.label}</label>
-                <span className={`p-1 px-2 text-xs rounded-md font-medium ${stage.backgroundColor} ${stage.color}`}>{stage.count}</span>
-              </button>
-            ))}
-            {/* <Select
+        <div className="flex flex-col md:flex-row space-x-3 mb-2 items-start  p-1">
+          <div className="flex space-x-3 w-full md:w-auto items-center mb-3 mb:md-0 ">
+            <Select
               className="w-5/6 md:w-56 text-xs"
               styles={selectStyle}
               // components={{ Option }}
@@ -652,11 +707,9 @@ const JobApplicants = () => {
               className="w-16 h-9 px-3 inline-flex justify-center items-center rounded-md text-xs font-medium text-white shadow-sm bg-[#7C7AFC] hover:bg-sky-500 focus-visible:outline-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               Apply
-            </button> */}
-            
-            
+            </button>
           </div>
-          {/* <div className="w-full  flex items-start flex-wrap md:space-x-3">
+          <div className="w-full  flex items-start flex-wrap md:space-x-3">
             {selectedFilterGroup &&
               showFilter &&
               filterGroups.map((group, index) => {
@@ -712,19 +765,37 @@ const JobApplicants = () => {
                   return null; // or any other default content or nothing
                 }
               })}
-          </div> */}
-          
+          </div>
+          <div
+            className="w-full flex gap-x-4 justify-end p-2 mb-1"
+            style={{ fontSize: ".8rem" }}
+          >
+            <span className="flex items-center gap-x-1  text-gray-600 font-medium">
+              <div className={`w-2 h-2 rounded-full bg-gray-400`}></div>
+              Not Shortlisted
+            </span>
+            <span className="flex items-center gap-x-1  text-gray-600 font-medium">
+              <div className={`w-2 h-2 rounded-full bg-yellow-400`}></div>
+              In Progress
+            </span>
+            <span className="flex items-center gap-x-1  text-gray-600 font-medium">
+              <div className={`w-2 h-2 rounded-full bg-emerald-400`}></div>
+              Completed
+            </span>
+            <span className="flex items-center gap-x-1 text-gray-600 font-medium">
+              <div className={`w-2 h-2 rounded-full bg-blue-400`}></div>
+              Approved
+            </span>
+          </div>
           {/* <button className="mb-3 inline-flex items-center rounded-md  px-3 py-2 text-xs font-semibold text-white shadow-sm bg-sky-500 hover:bg-sky-500 focus-visible:outline-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">Apply Filter Group</button> */}
         </div>
-        {
-          viewMode === "tabular" && 
-          <ApplicantList
+        <ApplicantList
           setTotalApplicants={setTotalApplicants}
           updateStatus={updateStatus}
           tableInstance={tableInstance}
           setTableInstance={setTableInstance}
           jobId={jobId}
-          url={url}
+          url={`/filter/candidate/${jobId}/`}
           userDetails={userDetails}
           checked={checked}
           applicants={filteredApplicants}
@@ -733,13 +804,6 @@ const JobApplicants = () => {
           handleUnshortList={updateStatus}
           setTableRowCount={setTableRowCount}
         />
-        }
-        {
-          viewMode === "stage" && 
-          <div className="w-full h-full">
-              <ApplicantByStages viewMode={viewMode} selectedStage={selectedStage} jobId={jobId} />
-            </div>
-        }
       </div>
 
       {showModal && (

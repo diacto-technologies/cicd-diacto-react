@@ -3,7 +3,6 @@ import AuthContext from "../../context/AuthContext";
 import AvatarContext from "../../context/AvatarContext";
 import FeedbackList from "./CommentsQuickList";
 import CommentsDetailedList from "./CommentsDetailedList";
-import { api } from "../../constants/constants";
 
 const ProfileComments = ({ jobId, scores, applicant, resumeDetail }) => {
 
@@ -20,7 +19,7 @@ const ProfileComments = ({ jobId, scores, applicant, resumeDetail }) => {
         try {
             setLoadingComments(true);
             console.log(jobId)
-            const response = await fetch(`${api}/interview/feedbacks/${jobId}/${applicant.id}/`);
+            const response = await fetch(`/interview/feedbacks/${jobId}/${applicant.id}/`);
             if (!response.ok) {
 
                 setComments([])

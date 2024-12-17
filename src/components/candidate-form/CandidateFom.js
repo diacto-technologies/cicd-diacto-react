@@ -8,7 +8,6 @@ import './CandidateForm.css'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.bubble.css';
 import CandidHRLogo from "../../assets/PNG/icon_whiteB.png"
-import { api } from "../../constants/constants";
 const CandidateForm = ({ }) => {
 
     // const { user, authTokens, logoutUser } = useContext(AuthContext);
@@ -30,7 +29,6 @@ const CandidateForm = ({ }) => {
     const [country, setCountry] = useState(null);
     const [orgLogo, setOrgLogo] = useState('')
     const [userName, setUserName] = useState('')
-    const [showDescription, setShowDescription] = useState(false)
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -82,7 +80,7 @@ const CandidateForm = ({ }) => {
     const fetchJob = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${api}/jobs/candidate-view/${jobkey}/`,
+            const response = await fetch(`/jobs/candidate-view/${jobkey}/`,
                 {
                     method: "GET",
                     headers: {
@@ -120,7 +118,7 @@ const CandidateForm = ({ }) => {
         // fetch the step using workflow id and return the step.
 
         if (jobId) {
-            const response = await fetch(`${api}/resume_parser/resume-screening-preferences/?job_id=${jobId}`,
+            const response = await fetch(`/resume_parser/resume-screening-preferences/?job_id=${jobId}`,
                 {
                     method: "GET",
                     headers: {
@@ -139,7 +137,7 @@ const CandidateForm = ({ }) => {
 
     const getOrgLogo = async (id) => {
         try {
-            const response = await fetch(`${api}/accounts/organization-logo/${id}/`, {
+            const response = await fetch(`/accounts/organization-logo/${id}/`, {
                 method: 'GET',
                 headers: {
                     // Authorization: "Bearer " + String(token.access),
@@ -192,9 +190,9 @@ const CandidateForm = ({ }) => {
                                             </svg>
                                         </div>
                                         {/* <div className="bg-transparent md:bg-white relative z-10 flex flex-col justify-start md:justify-evenly h-90 px-5 md:py-5 md:px-10 rounded-3xl overflow-auto md:overflow-hidden"> */}
-                                        <div className={`bg-transparent ${!showDescription && "w-4/6"} md:bg-white relative z-10 flex flex-col justify-start md:justify-evenly h-screen md:h-[95%] py-6 px-5 md:py-5 md:px-10 rounded-3xl overflow-auto md:overflow-hidden`}>
+                                        <div className="bg-transparent md:bg-white relative z-10 flex flex-col justify-start md:justify-evenly h-screen md:h-[95%] py-6 px-5 md:py-5 md:px-10 rounded-3xl overflow-auto md:overflow-hidden">
 
-                                            <div className={`flex flex-col-reverse md:flex-row mb-3 gap-3 md:gap-0 pb-4 md:pb-0 border-b md:border-0`}>
+                                            <div className="flex flex-col-reverse md:flex-row w-full mb-3 pb-4 md:pb-0 border-b md:border-0">
                                                 <CandidateFormHeading jobDetail={jobDetail} />
                                                 <div className="flex gap-5 items-center justify-end">
 
@@ -203,68 +201,55 @@ const CandidateForm = ({ }) => {
                                                     <img src={CandidHRLogo} className="w-fit h-fit max-h-12" />
                                                 </div>
                                             </div>
-                                            <div className="w-full relative">
-                                                <button
-                                                    onClick={() => {
-                                                        setShowDescription(!showDescription);
-                                                    }}
-                                                    className="transitions-all text-indigo-500 px-3 py-1.5 rounded-md ring-2 ring-indigo-300 hover:ring-indigo-600 hover:text-indigo-700"
-                                                >{showDescription ? "Hide Description" : "Show Description"}
-                                                </button>
-                                            </div>
 
-                                            <div className="md:flex md:h-5/6 bg-white justify-evenly items-start w-full py-3">
-                                                {showDescription && (<>
-                                                    <div className={`w-full md:w-3/6 mb-3 md:mb-0 md:h-full flex flex-col justify-start items-center me-4 px-4 ${isSubmitted && 'hidden md:flex flex-col'}`} >
-                                                        <div className="mb-2 mt-2 w-full ">
-                                                            {/* <TextToSpeech setIsSpeaking={setIsSpeaking} isSpeaking={isSpeaking} text={`माझं नाव शुभम आहे`}  /> */}
-                                                            <label className=" font-medium text-base tracking-normal">Must Have Skills</label>
-                                                            {
-                                                                jobDetail.must_have_skills?.length > 0 && jobDetail.must_have_skills[0].label !== "" ?
-                                                                    <dd className="mt-1  text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                                                        {jobDetail.must_have_skills.map((skill, index) => (
-                                                                            <span key={index} className={`inline-flex items-center rounded-md me-2 mb-2 px-2 py-1 text-xs font-medium text-indigo-500 ring-1 bg-gray-50  ring-indigo-300`}>
-                                                                                {skill.label}
-                                                                            </span>
+                                            <div className="md:flex h-auto py-4 md:h-5/6 bg-white justify-evenly items-start w-full ">
+                                                <div className={`w-full md:w-3/6 mb-3 md:mb-0 md:h-full flex flex-col justify-start items-center me-4 px-4 ${isSubmitted && 'hidden md:flex flex-col'}`} >
+                                                    <div className="mb-2 mt-2 w-full ">
+                                                        {/* <TextToSpeech setIsSpeaking={setIsSpeaking} isSpeaking={isSpeaking} text={`माझं नाव शुभम आहे`}  /> */}
+                                                        <label className=" font-medium text-base tracking-normal">Must Have Skills</label>
+                                                        {
+                                                            jobDetail.must_have_skills?.length > 0 && jobDetail.must_have_skills[0].label !== "" ?
+                                                                <dd className="mt-1  text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                                                    {jobDetail.must_have_skills.map((skill, index) => (
+                                                                        <span key={index} className={`inline-flex items-center rounded-md me-2 mb-2 px-2 py-1 text-xs font-medium text-sky-700 bg-gray-50 ring-1 ring-inset ring-gray-600/20' `}>
+                                                                            {skill.label}
+                                                                        </span>
 
-                                                                        ))}
+                                                                    ))}
 
-                                                                    </dd>
-                                                                    :
-                                                                    <dd className="text-gray-500">Could not extract skills or not found</dd>
+                                                                </dd>
+                                                                :
+                                                                <dd className="text-gray-500">Could not extract skills or not found</dd>
 
-                                                            }
-                                                        </div>
-
-
-                                                        <label className="  font-bold text-base md:text-xl tracking-normal w-full">Job Description</label>
-                                                        {description &&
-                                                            <div className={`px-4 py-2 text-xs md:text-base h-48 md:h-auto my-3 md:my-0 overflow-auto`}>
-                                                                <ReactQuill theme="bubble"
-                                                                    value={jobDetail.jd_html || description}
-                                                                    className="overflow-auto"
-                                                                    readOnly={true}
-
-                                                                />
-                                                            </div>
-                                                            // <div className={`px-4 py-2 text-xs md:text-base h-80p my-3 md:my-0   ${showFullDescription ? 'overflow-auto' : 'overflow-hidden'}`} dangerouslySetInnerHTML={{ __html: description }} />
                                                         }
                                                     </div>
-                                                    <div className="border h-full hidden md:flex"></div>
-                                                </>)}
-                                                {!isSubmitted ?
-                                                    <div className={`md:${showDescription ? "w-1/2" : "w-full"} md:mt-5 sm:mt-0 bg-transparent md:h-full flex flex-col items-center justify-center me-4 px-4 gap-3`}>
-                                                        <div className={`w-full h-full`}>
-                                                            <CandidateQuestions setUserName={setUserName} workflow_id={jobDetail.interview_module} preference={preference} jobDetail={jobDetail} city={city} state={state} setIsSubmitted={setIsSubmitted} jobkey={jobkey} country={country} />
+
+
+                                                    <label className="  font-bold text-base md:text-xl tracking-normal w-full">Job Description</label>
+                                                    {description &&
+                                                        <div className={`px-4 py-2 text-xs md:text-base h-48 md:h-auto my-3 md:my-0 overflow-auto`}>
+                                                            <ReactQuill theme="bubble"
+                                                                value={jobDetail.jd_html || description}
+                                                                className="overflow-auto"
+                                                                readOnly={true}
+
+                                                            />
                                                         </div>
+                                                        // <div className={`px-4 py-2 text-xs md:text-base h-80p my-3 md:my-0   ${showFullDescription ? 'overflow-auto' : 'overflow-hidden'}`} dangerouslySetInnerHTML={{ __html: description }} />
+                                                    }
+                                                </div>
+                                                <div className="border h-full hidden md:flex"></div>
+                                                {!isSubmitted ?
+                                                    <div className="w-full mt-5 sm:mt-0 md:w-3/6 bg-transparent md:h-full flex flex-col justify-between me-4 px-4 gap-3">
+                                                        <CandidateQuestions setUserName={setUserName} workflow_id={jobDetail.interview_module} preference={preference} jobDetail={jobDetail} city={city} state={state} setIsSubmitted={setIsSubmitted} jobkey={jobkey} country={country} />
                                                     </div>
                                                     :
                                                     <div className="w-full md:w-3/6 flex flex-col justify-center items-center h-full me-4 px-4">
-                                                        <label className="mb-5 font-bold antialiased text-3xl text-gray-700 p-3 text-center">Thank You, {userName}!</label>
+                                                        <label className="mb-5 font-bold antialiased text-3xl text-gray-700 p-3">Thank You, {userName}!</label>
                                                         <div class="image mb-5">
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g stroke-width="0" id="SVGRepo_bgCarrier"></g><g stroke-linejoin="round" stroke-linecap="round" id="SVGRepo_tracerCarrier"></g><g id="SVGRepo_iconCarrier"> <path stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="white" d="M20 7L9.00004 18L3.99994 13"></path> </g></svg>
                                                         </div>
-                                                        <label className="font-medium antialiased text-xl text-center text-gray-700 p-3">Your Application Has Been Successfully Submitted</label>
+                                                        <label className="font-medium antialiased text-xl text-gray-700 p-3">Your Application Has Been Successfully Submitted</label>
                                                         <p className="text-sm text-gray-500 w-full text-center">We appreciate your interest. Our team is currently reviewing your application, and we’ll be in touch with you shortly.</p>
                                                     </div>
                                                 }

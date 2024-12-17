@@ -24,7 +24,6 @@ const AssignedAssessments = () => {
           hozAlign: "left",
           vertAlign: "middle",
           minWidth: 150,
-          maxWidth: 210,
           titleFormatter: function (cell, formatterParams, onRendered) {
             return (
               '<div class="column-container">' +
@@ -85,7 +84,6 @@ const AssignedAssessments = () => {
           hozAlign: "left",
           vertAlign: "middle",
           minWidth: 150,
-          maxWidth: 300,
           titleFormatter: function (cell, formatterParams, onRendered) {
             return (
               '<div class="column-container">' +
@@ -100,7 +98,6 @@ const AssignedAssessments = () => {
           hozAlign: "left",
           vertAlign: "middle",
           minWidth: 150,
-          maxWidth: 250,
           titleFormatter: function (cell, formatterParams, onRendered) {
             return (
               '<div class="column-container">' +
@@ -120,7 +117,6 @@ const AssignedAssessments = () => {
           hozAlign: "left",
           vertAlign: "middle",
           minWidth: 150,
-          maxWidth: 250,
           titleFormatter: function (cell, formatterParams, onRendered) {
             return (
               '<div class="column-container">' +
@@ -153,7 +149,6 @@ const AssignedAssessments = () => {
           hozAlign: "left",
           vertAlign: "middle",
           minWidth: 150,
-          maxWidth: 250,
           titleFormatter: function (cell, formatterParams, onRendered) {
             return (
               '<div class="column-container">' +
@@ -182,8 +177,7 @@ const AssignedAssessments = () => {
           field: "status_text",
           hozAlign: "left",
           vertAlign: "middle",
-          maxWidth: 150,
-          maxWidth: 250,
+          minWidth: 150,
           titleFormatter: function (cell, formatterParams, onRendered) {
             return (
               '<div class="column-container">' +
@@ -228,36 +222,6 @@ const AssignedAssessments = () => {
             }
     
     
-          },
-          headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-          headerFilter: emptyHeaderFilter,
-          headerFilterFunc: "like",
-        },
-        {
-          title: "Reason",
-          field: "message",
-          hozAlign: "left",
-          vertAlign: "middle",
-          minWidth: 150,
-          titleFormatter: function (cell, formatterParams, onRendered) {
-            return (
-              '<div class="column-container">' +
-              `<label class="column-title">${cell.getValue()}</label>` +
-              "</div>"
-            );
-          },
-          //   headerPopup: headerPopupFormatter,
-          formatter: function (cell) {
-            const proctoringData = cell.getRow().getData().proctoring || null;
-            let message = ""
-            if (proctoringData && proctoringData.message) {
-                message = proctoringData.message
-            }
-            return `<label title="${message}" class="">${
-              message
-                ? message
-                : ""
-            }</label>`;
           },
           headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
           headerFilter: emptyHeaderFilter,

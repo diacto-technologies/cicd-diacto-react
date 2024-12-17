@@ -5,7 +5,6 @@ import "../../utils/react-quill/Toolbar.css"
 import 'react-quill/dist/quill.snow.css';
 import Instruction from "./Instruction";
 import TestEnd from "./TestEnd";
-import { api } from "../../constants/constants";
 // candidate interface
 const CandidateInterface = () => {
     const { candidateId, testlogId, uniqueId } = useParams();
@@ -57,7 +56,7 @@ const CandidateInterface = () => {
         try{
             
             // ?test_id=${currentTest.id}&
-            const response = await fetch(`${api}/test/test-status/?test_log=${testlogId}`, {
+            const response = await fetch(`/test/test-status/?test_log=${testlogId}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -102,7 +101,7 @@ const CandidateInterface = () => {
         setLoading(true)
         try{
 
-            const response = await fetch(`${api}/test/testlog/${testlogId}/`, {
+            const response = await fetch(`/test/testlog/${testlogId}/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -143,7 +142,7 @@ async function fetchQuestion(id){
     try {
             // Create an array of fetch promises for each question ID
             
-              const response =await fetch(`${api}/test/questions/${id}/`, {
+              const response =await fetch(`/test/questions/${id}/`, {
                 method: "GET",
                 headers: {
                   "Content-Type": "application/json",
@@ -250,7 +249,7 @@ async function fetchQuestion(id){
         }
         try{
 
-            const response = await fetch(`${api}/test/testlog/${testlogId}/`, {
+            const response = await fetch(`/test/testlog/${testlogId}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -350,7 +349,7 @@ async function fetchQuestion(id){
         
         try{
             
-            const response = await fetch(`${api}/test/answers/`, {
+            const response = await fetch(`/test/answers/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -428,7 +427,7 @@ async function fetchQuestion(id){
             test_logid:testlogId,
             test_id:currentTest.id
         }
-        const response = await fetch(`${api}/test/result/`, {
+        const response = await fetch(`/test/result/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

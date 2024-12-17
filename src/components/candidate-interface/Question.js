@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../../constants/constants';
 
 const Question = ({ question, onNextQuestion, candidateId, testlogId }) => {
   const [timeLeft, setTimeLeft] = useState(question.time_limit || 60); // Default to 60 seconds if not provided
@@ -96,7 +95,7 @@ const Question = ({ question, onNextQuestion, candidateId, testlogId }) => {
     }
 
     try {
-      const response = await fetch(`${api}/test/answers/`, {
+      const response = await fetch(`/test/answers/`, {
         method: 'POST',
         headers: question.type === 'audio' ? {} : { 'Content-Type': 'application/json' },
         body: question.type === 'audio' ? payload : JSON.stringify(payload),

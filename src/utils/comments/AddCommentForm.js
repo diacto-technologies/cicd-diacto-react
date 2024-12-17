@@ -4,7 +4,6 @@ import { ChevronDownIcon, PlusIcon, TrashIcon } from '@heroicons/react/20/solid'
 import Select from 'react-select';
 import AuthContext from '../../context/AuthContext';
 import AvatarContext from '../../context/AvatarContext';
-import { api } from '../../constants/constants';
 
 const AddCommentForm = ({ setComments, jobId, candidate, user }) => {
     let close = useClose()
@@ -51,7 +50,7 @@ const AddCommentForm = ({ setComments, jobId, candidate, user }) => {
 
         try {
             setLoading(true)
-            const response = await fetch(`${api}/interview/interview-step-feedback/`,
+            const response = await fetch(`/interview/interview-step-feedback/`,
                 {
                     method: "POST",
                     headers: {

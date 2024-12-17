@@ -3,7 +3,6 @@ import { TabulatorFull as Tabulator } from 'tabulator-tables';
 import "tabulator-tables/dist/css/tabulator.min.css";
 import './Table.css'
 import AuthContext from '../../context/AuthContext';
-import { api } from '../../constants/constants';
 
 const Table = ({ setTableInstance, data, columns, url, fieldMapping, setTableRowCount }) => {
     var table = {}
@@ -36,7 +35,7 @@ const Table = ({ setTableInstance, data, columns, url, fieldMapping, setTableRow
             progressiveLoad: "scroll",
             // progressiveLoadScrollMargin:50, //trigger next ajax load when scroll bar is 300px or less from the bottom of the table.
             ajaxSorting: true,      // Enable server-side sorting
-            ajaxURL: (api + url),
+            ajaxURL: url,
             ajaxConfig: {
                 method: "GET", //set request type to Position
                 headers: {
@@ -76,22 +75,14 @@ const Table = ({ setTableInstance, data, columns, url, fieldMapping, setTableRow
                 //config - the request config object from the ajaxConfig property
                 //params - the params object from the ajaxParams property, this will also include any pagination, filter and sorting properties based on table setup
                 const pageNumber = params.page || 2;
-                // let endpointURL = params.page === 1 ? url : url + "?page=" + pageNumber;
-                let endpointURL = url;
-                if (url.includes("?")) {
-                    // If '?' is present, add additional parameters with '&'
-                    endpointURL += "&page=" + pageNumber;
-                } else {
-                    // If '?' is not present, start the query string with '?'
-                    endpointURL += "?page=" + pageNumber;
-                }
+                let endpointURL = params.page === 1 ? url : url + "?page=" + pageNumber;
                 //console.log("Urls: ", url, "config: ", config, "params: ", params, "data: ", data)
 
                 // Loop through the filter parameters if available
                 if (params?.filter && params?.filter?.length > 0) {
                     const newQuery = buildQueryParams(params?.filter, []);
-                    console.log(endpointURL.includes("?"));
-                    endpointURL += endpointURL.includes("?") ? `&${newQuery}` : `?${newQuery}`;
+                    //console.log(newQuery);
+                    endpointURL += params.page === 1 ? `?${newQuery}` : `&${newQuery}`;
                     if (params?.sort && params?.sort?.length > 0) {
                         const field = fieldMapping && fieldMapping[params.sort[0].field] ? fieldMapping[params.sort[0].field] : params.sort[0].field;
                         const dir = params.sort[0].dir;
@@ -102,7 +93,7 @@ const Table = ({ setTableInstance, data, columns, url, fieldMapping, setTableRow
                     if (params?.sort && params?.sort?.length > 0) {
                         const field = fieldMapping && fieldMapping[params.sort[0].field] ? fieldMapping[params.sort[0].field] : params.sort[0].field;
                         const dir = params.sort[0].dir;
-                        endpointURL += `${endpointURL.includes("?") ?"&":"?"}o=${dir === "asc" ? field : '-' + field}`;
+                        endpointURL += `${params.page === 1?"?":"&"}o=${dir === "asc" ? field : '-' + field}`;
                     }
                 }
                 return endpointURL; //encode parameters as a json object
@@ -117,7 +108,7 @@ const Table = ({ setTableInstance, data, columns, url, fieldMapping, setTableRow
             table.destroy();
         };
 
-    }, [url])
+    }, [])
 
     const buildQueryParams = (filters, sortModel) => {
         //console.log(filters)
@@ -138,9 +129,7 @@ const Table = ({ setTableInstance, data, columns, url, fieldMapping, setTableRow
 
     return (
         <>
-            
-            <div id="custom-table" ></div>
-
+            <div id="custom-table" className=""></div>
         </>
     );
 }

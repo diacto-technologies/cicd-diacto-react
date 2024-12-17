@@ -12,7 +12,6 @@ import PersonalInfoForm from "./PersonalInfoForm.js";
 import QuestionTestForm from "./QuestionTestForm.js";
 import ProfessionalInfoForm from "./ProfessionalInfoForm.js";
 import CriteriaForm from "../../components/candidate-form/CriteriaForm.js";
-import { api } from "../../constants/constants.js";
 
 const CandidateQuestions = ({
   setUserName,
@@ -25,19 +24,12 @@ const CandidateQuestions = ({
   setIsSubmitted,
   workflow_id,
 }) => {
-  const [resumeFile, setResumeFile] = useState(null);
-  const [profilePic, setProfilePic] = useState(null);
-  const [introVideo, setIntroVideo] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [candidateToEdit, setCandidateToEdit] = useState(null);
   const [error, setError] = useState({});
   const [questions, setQuestions] = useState([]);
   const [maxRetriesExceeded, setMaxRetriesExceeded] = useState(false);
-  const [criteriaPayload, setCriteriaPayload] = useState({
-    "candidate_id": null,
-    "job_id": null,
-    "responses": []
-  });
   const [userFormData, setUserFormData] = useState({
     name: "",
     email: "",
@@ -48,7 +40,6 @@ const CandidateQuestions = ({
     },
     linkedin: "",
     github: "",
-    personal_website: "",
     last_increment: "",
     expected_ctc: "",
     current_ctc: "",
@@ -59,8 +50,7 @@ const CandidateQuestions = ({
 
   const [submitting, setSubmitting] = useState(false);
   const [responses, setResponses] = useState([]);
-  const [criteriaResponses, setCriteriaResponses] = useState({});
-  const [criteriaErrors, setCriteriaErrors] = useState(null);
+
   const [formValidationResponse, setFormValidationResponse] = useState(null);
   // Reference to the input element
   const fileInputRef = useRef(null);
@@ -76,7 +66,6 @@ const CandidateQuestions = ({
         preference?.include_expected_ctc ||
         preference?.include_github ||
         preference?.include_linkedin ||
-        preference?.include_personal_website ||
         preference?.include_notice_period ||
         preference?.include_relevant_experience ||
         preference?.last_increment) &&
@@ -119,19 +108,6 @@ const CandidateQuestions = ({
     }
   }, [preference]);
 
-  useEffect(() => {
-    const payload = {
-      //   candidate_id: candidateId,
-      job_id: jobDetail?.id,
-      responses: Object.entries(criteriaResponses).map(([criteriaId, response]) => ({
-        criteria_id: criteriaId,
-        response: response,
-      })),
-    };
-
-    setCriteriaPayload(payload)
-  }, [criteriaResponses])
-
   const handleInputChange = (field, value) => {
     if (field === "city" || field === "state") {
       setUserFormData({
@@ -169,47 +145,21 @@ const CandidateQuestions = ({
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
+    // if (file) {
     const fileExtension = file.name.split(".").pop().toLowerCase();
-    if (event.target.name === "resume-upload") {
-      if (fileExtension === "pdf") {
-        setResumeFile(file);
-      } else {
-        setResumeFile(null);
-        setFormValidationResponse({
-          error: "Please upload the file in PDF format",
-        });
-        // Reset the input field value so that user can re-select the same file
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ""; // Clear the input value
-        }
-      }
-    }
-    else if (event.target.name === "profile-pic-upload") {
-      if (fileExtension === "jpg" || fileExtension === "jpeg" || fileExtension === "png") {
-        setProfilePic(file);
-      } else {
-        setProfilePic(null);
-        setFormValidationResponse({
-          error: "Please upload the file in JPG, JPEG or PNG format",
-        });
-        // Reset the input field value so that user can re-select the same file
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ""; // Clear the input value
-        }
-      }
-    }
-    else if (event.target.name === "intro-video-upload") {
-      if (fileExtension === "mp4" || fileExtension === "mov") {
-        setIntroVideo(file);
-      } else {
-        setIntroVideo(null);
-        setFormValidationResponse({
-          error: "Please upload the file in MP3 or MOV format",
-        });
-        // Reset the input field value so that user can re-select the same file
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ""; // Clear the input value
-        }
+    if (fileExtension === "pdf") {
+      setSelectedFile(file);
+    } else {
+      setSelectedFile(null);
+      setFormValidationResponse({
+        error: "Please upload the file in PDF format",
+      });
+      // setTimeout(() => {
+      //   setFormValidationResponse(null);
+      // }, 3000);
+      // Reset the input field value so that user can re-select the same file
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Clear the input value
       }
     }
   };
@@ -217,7 +167,7 @@ const CandidateQuestions = ({
   const check_email_exists = async () => {
     try {
       const response = await fetch(
-        `${api}/candidates/check-email/${jobDetail.id}/${userFormData.email}/`,
+        `/candidates/check-email/${jobDetail.id}/${userFormData.email}/`,
         {
           method: "GET",
           headers: {
@@ -256,7 +206,7 @@ const CandidateQuestions = ({
   const updateResume = async () => {
     try {
       if (
-        resumeFile &&
+        selectedFile &&
         userFormData.name &&
         userFormData.email &&
         jobkey &&
@@ -270,20 +220,12 @@ const CandidateQuestions = ({
         formData.append("email", userFormData.email);
         formData.append("location", JSON.stringify(userFormData.location));
         formData.append("linkedin", userFormData.linkedin);
-        formData.append("file", resumeFile);
-        if (profilePic) {
-          formData.append("profile_pic", profilePic);
-        }
-        if (introVideo) {
-          formData.append("intro_video", introVideo);
-        }
-        
+        formData.append("file", selectedFile);
         formData.append("applied_job", candidateToEdit.applied_job);
         formData.append("resume", candidateToEdit.resume);
 
         formData.append("linkedin", userFormData.linkedin);
         formData.append("github", userFormData.github);
-        formData.append("personal_website", userFormData.personal_website);
         formData.append("last_increment", userFormData.last_increment);
         formData.append("expected_ctc", userFormData.expected_ctc);
         formData.append("current_ctc", userFormData.current_ctc);
@@ -308,7 +250,7 @@ const CandidateQuestions = ({
         });
 
         const response = await fetch(
-          `${api}/candidates/candidate/${candidateToEdit.id}/`,
+          `/candidates/candidate/${candidateToEdit.id}/`,
           {
             method: "PATCH",
             body: formData,
@@ -318,8 +260,6 @@ const CandidateQuestions = ({
         if (response.ok) {
           setSubmitting(false);
           setIsSubmitted(true);
-          const data = await response.json();
-          handleSetCriteria(data.id);
         } else {
           setSubmitting(false);
           console.error("Update failed");
@@ -336,16 +276,16 @@ const CandidateQuestions = ({
     const error = getValidationErrors(step);
     if (error) {
       setFormValidationResponse({ error });
+      // Clear the error message after 3 seconds
+      // setTimeout(() => {
+      //   setFormValidationResponse(null);
+      // }, 3000);
       return;
-    }
-
-    if(validateCriteria()){
-      return
     }
 
     try {
       if (
-        resumeFile &&
+        selectedFile &&
         userFormData.name &&
         userFormData.email &&
         jobkey &&
@@ -359,14 +299,11 @@ const CandidateQuestions = ({
         formData.append("email", userFormData.email);
         formData.append("location", JSON.stringify(userFormData.location));
         formData.append("contact", userFormData.contact);
-        formData.append("file", resumeFile);
-        formData.append("profile_pic", profilePic);
-        formData.append("intro_video", introVideo);
+        formData.append("file", selectedFile);
         formData.append("job_key", jobkey);
         formData.append("workflow_id", workflow_id);
         formData.append("linkedin", userFormData.linkedin);
         formData.append("github", userFormData.github);
-        formData.append("personal_website", userFormData.personal_website);
         formData.append("last_increment", userFormData.last_increment);
         formData.append("expected_ctc", userFormData.expected_ctc);
         formData.append("current_ctc", userFormData.current_ctc);
@@ -393,15 +330,13 @@ const CandidateQuestions = ({
         const data = await check_email_exists(jobDetail.id, userFormData.email);
 
         if (!data.exists) {
-          const response = await fetch(`${api}/candidates/candidate/`, {
+          const response = await fetch("/candidates/candidate/", {
             method: "POST",
             body: formData,
           });
 
           if (response.ok) {
             // await logFeature(jobDetail?.organization?.id, 1);
-            const data = await response.json();
-            handleSetCriteria(data.candidate_id);
             setSubmitting(false);
             setIsSubmitted(true);
           } else {
@@ -409,10 +344,12 @@ const CandidateQuestions = ({
           }
         } else {
           setSubmitting(false);
+          const preference = { max_retries: 1 };
+
           // Only check if recruiter has set max retries value
           if (preference?.max_retries && preference?.max_retries >= 0) {
             // If candidate's retries is greater than max_retries then dont allow to upload.
-            if (!(data.retries > preference?.max_retries)) {
+            if (data.retries && !(data.retries > preference?.max_retries)) {
               setCandidateToEdit(data);
               setError("You have already applied to this job");
             } else {
@@ -431,14 +368,8 @@ const CandidateQuestions = ({
         if (!jobkey) {
           err.jobkey = "Unable to fetch job details. Please try again later";
         }
-        if (!resumeFile) {
-          err.resumeFile = "Please upload your resume";
-        }
-        if (!profilePic && preference?.include_profile_pic) {
-          err.profilePic = "Please upload your profile picture";
-        }
-        if (!introVideo && preference?.include_intro_video) {
-          err.introVideo = "Please upload a 1 min introduction video";
+        if (!selectedFile) {
+          err.selectedFile = "Please upload your resume";
         }
         if (!userFormData.name) {
           err.name = "Full Name is mandatory";
@@ -475,34 +406,7 @@ const CandidateQuestions = ({
     }
   };
 
-  const handleSetCriteria = async (candidate_id) => {
-    const payload = {
-      "candidate_id": candidate_id,
-      ...criteriaPayload
-    }
-    try {
-      const response = await fetch(`${api}/jobs/candidate-responses/bulk-create/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Authorization: "Bearer " + String(authTokens.access),
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        // await logFeature(jobDetail?.organization?.id, 1);
-        const data = await response.json();
-      } else {
-        console.error("Not able to set criteria");
-      }
-    } catch (error) {
-      setSubmitting(false);
-      setError(error);
-      console.error("Error uploading file:", error);
-    }
-  }
-
+  
 
   const responseChange = (questionId, answer, type) => {
     setResponses((prevResponses) => {
@@ -545,70 +449,63 @@ const CandidateQuestions = ({
       validationFields = [
         { value: userFormData.name, message: "Please enter full name" },
         { value: userFormData.email, message: "Please enter email" },
-        { value: userFormData.contact, message: "Please enter contact details" },
+        {
+          value: userFormData.contact,
+          message: "Please enter contact details",
+        },
         { value: userFormData.location.city, message: "Please enter city" },
         { value: userFormData.location.state, message: "Please enter state" },
-        { value: resumeFile, message: "Please upload a resume" },
-        (preference?.include_profile_pic && { value: profilePic, message: "Please upload a profile picture" }),
-        (preference?.include_intro_video && { value: introVideo, message: "Please upload a 1 min introduction video" }),
+        { value: selectedFile, message: "Please upload a resume" },
       ];
     } else if (stepTitles[step] === "Professional Info") {
       validationFields = [
         ...(preference.include_notice_period
           ? [
-            {
-              value: userFormData.notice_period_in_months,
-              message: "Please enter notice period",
-            },
-          ]
+              {
+                value: userFormData.notice_period_in_months,
+                message: "Please enter notice period",
+              },
+            ]
           : []),
         ...(preference.include_relevant_experience
           ? [
-            {
-              value: userFormData.relevant_experience_in_months,
-              message: "Please enter relevant experience (in months)",
-            },
-          ]
+              {
+                value: userFormData.relevant_experience_in_months,
+                message: "Please enter relevant experience (in months)",
+              },
+            ]
           : []),
         ...(preference.include_current_ctc
           ? [
-            {
-              value: userFormData.current_ctc,
-              message: "Please enter Current Annual Salary",
-            },
-          ]
+              {
+                value: userFormData.current_ctc,
+                message: "Please enter Current Annual Salary",
+              },
+            ]
           : []),
         ...(preference.include_expected_ctc
           ? [
-            {
-              value: userFormData.expected_ctc,
-              message: "Please enter Expected Annual Salary",
-            },
-          ]
+              {
+                value: userFormData.expected_ctc,
+                message: "Please enter Expected Annual Salary",
+              },
+            ]
           : []),
         ...(preference.include_linkedin
           ? [
-            {
-              value: userFormData.linkedin,
-              message: "Please provide your LinkedIn profile link",
-            },
-          ]
+              {
+                value: userFormData.linkedin,
+                message: "Please provide your LinkedIn profile link",
+              },
+            ]
           : []),
         ...(preference.include_github
           ? [
-            {
-              value: userFormData.github,
-              message: "Please provide your Github profile link",
-            },
-          ]
-          : []),
-        ...(preference.include_personal_website
-          ? [
-            {
-              value: userFormData.personal_website,
-              message: "Please provide your personal website link",
-            },
-          ]
+              {
+                value: userFormData.github,
+                message: "Please provide your Github profile link",
+              },
+            ]
           : []),
       ];
     } else if (stepTitles[step] === "Questions") {
@@ -630,19 +527,9 @@ const CandidateQuestions = ({
       }
     }
 
-    if (userFormData.linkedin && !validateWebsiteURL(userFormData.linkedin)) {
-      return "Please give a valid link in LinkedIn"
-    }
-    if (userFormData.github && !validateWebsiteURL(userFormData.github)) {
-      return "Please give a valid link in Github"
-    }
-    if (userFormData.personal_website && !validateWebsiteURL(userFormData.personal_website)) {
-      return "Please give a valid link in Personal website"
-    }
-
     // Collect and return any errors
     for (const field of validationFields) {
-      if (field?.value === "" || field?.value === null) {
+      if (field.value === "" || field.value === null) {
         return field.message;
       }
     }
@@ -650,35 +537,9 @@ const CandidateQuestions = ({
     return null; // No errors
   };
 
-  const validateCriteria = () => {
-    let error = {...criteriaErrors}
-    if (Object.entries(criteriaResponses).length) {
-      Object.entries(criteriaResponses).forEach(([criteriaId, criteriaRes]) => {
-        if (criteriaRes === "" || criteriaRes === null || (Array.isArray(criteriaRes) && criteriaRes?.length === 0)) {
-          // setCriteriaErrors({ [criteriaId]: "This field is mandatory" })
-          error[criteriaId] = "This field is mandatory"
-        }
-        else {
-          delete error[criteriaId]
-        }
-      })
-    }
-
-    setCriteriaErrors(error);
-    return Object.keys(error).length>0 ? true : false;
-  }
-
-  function validateWebsiteURL(url) {
-    const urlPattern = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]{1,63}\.)+([a-zA-Z]{2,})(\/[^\s]*)?$/;
-
-    return urlPattern.test(url);
-  }
-
   const handleNextButton = () => {
     const error = getValidationErrors(step);
-    if(validateCriteria() && step===1){
-      return
-    }
+
     if (error) {
       setFormValidationResponse({ error });
     } else {
@@ -687,6 +548,10 @@ const CandidateQuestions = ({
       }
       setStep((currStep) => currStep + 1);
     }
+
+    // setTimeout(() => {
+    //   setFormValidationResponse(null);
+    // }, 3000);
   };
 
   const handleBackButton = () => {
@@ -706,15 +571,15 @@ const CandidateQuestions = ({
               style={{ width: `${((step + 1) / stepTitles.length) * 100}%` }}
             ></div>
           </div>
-
-          <label className="text-blue-700/80">{step + 1}/{stepTitles.length}</label>
-
+          
+            <label className="text-blue-700/80">{step + 1}/{stepTitles.length}</label>
+          
         </div>
         <h2 className="font-bold mt-4 text-base tracking-normal text-gray-900">
           {/* Contact Details */}
           {stepTitles[step]}
         </h2>
-        {/* {formValidationResponse &&
+        {formValidationResponse &&
           Object.keys(formValidationResponse)[0] === "error" && (
             <div
               className="flex flex-grow items-center p-4 m-3 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50"
@@ -734,7 +599,7 @@ const CandidateQuestions = ({
                 {formValidationResponse[Object.keys(formValidationResponse)[0]]}
               </div>
             </div>
-          )} */}
+          )}
         {/* 
         {formValidationResponse &&
           Object.keys(formValidationResponse)[0] === "success" && (
@@ -765,28 +630,25 @@ const CandidateQuestions = ({
 
       <form
         id="candidate-question-form"
-        className="flex flex-col h-[80%] overflow-auto grow justify-between w-full"
+        className="flex flex-col h-auto overflow-auto grow justify-between w-full"
       >
         <div className="py-3">
-          {stepTitles[step] === "Personal Info" && (
-            <PersonalInfoForm
-              userFormData={userFormData}
-              handleInputChange={handleInputChange}
-              setUserName={setUserName}
-              handleKeyDown={handleKeyDown}
-              preference={preference}
-              PhotoIcon={PhotoIcon}
-              resumeFile={resumeFile}
-              profilePic={profilePic}
-              introVideo={introVideo}
-              handleFileChange={handleFileChange}
-              fileInputRef={fileInputRef}
-              country={country}
-              formValidationResponse={formValidationResponse}
-            />
-          )}
-          {stepTitles[step] === "Professional Info" && (
-            <>
+          <div className="px-0 md:px-4 grid grid-cols-1 md:grid-cols-2 gap-4 gap-y-4">
+            {stepTitles[step] === "Personal Info" && (
+              <PersonalInfoForm
+                userFormData={userFormData}
+                handleInputChange={handleInputChange}
+                setUserName={setUserName}
+                handleKeyDown={handleKeyDown}
+                preference={preference}
+                PhotoIcon={PhotoIcon}
+                selectedFile={selectedFile}
+                handleFileChange={handleFileChange}
+                fileInputRef={fileInputRef}
+                country={country}
+              />
+            )}
+            {stepTitles[step] === "Professional Info" && (
               <ProfessionalInfoForm
                 userFormData={userFormData}
                 handleInputChange={handleInputChange}
@@ -794,33 +656,27 @@ const CandidateQuestions = ({
                 handleKeyDown={handleKeyDown}
                 preference={preference}
                 PhotoIcon={PhotoIcon}
+                selectedFile={selectedFile}
                 handleFileChange={handleFileChange}
                 fileInputRef={fileInputRef}
-                formValidationResponse={formValidationResponse}
               />
-              <CriteriaForm
-                setFormValidationResponse={setFormValidationResponse}
-                jobId={jobDetail?.id}
-                criteriaResponses={criteriaResponses}
-                setCriteriaResponses={setCriteriaResponses}
-                criteriaErrors={criteriaErrors} />
-            </>
-          )}
-          {stepTitles[step] === "Questions" && (
-            <QuestionTestForm
-              questions={questions}
-              InformationCircleIcon={InformationCircleIcon}
-              responseChange={responseChange}
-              AudioInput={AudioInput}
-              setError={setError}
-              responses={responses}
-              setResponses={setResponses}
-              error={error}
-              jobDetail={jobDetail}
-              formValidationResponse={formValidationResponse}
-            />
-            // <CriteriaForm jobId={jobDetail?.id} />
-          )}
+              // <CriteriaForm jobId={jobDetail?.id} />
+            )}
+            {stepTitles[step] === "Questions" && (
+              <QuestionTestForm
+                questions={questions}
+                InformationCircleIcon={InformationCircleIcon}
+                responseChange={responseChange}
+                AudioInput={AudioInput}
+                setError={setError}
+                responses={responses}
+                setResponses={setResponses}
+                error={error}
+                jobDetail={jobDetail}
+              />
+              // <CriteriaForm jobId={jobDetail?.id} />
+            )}
+          </div>
         </div>
       </form>
 

@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 import Header from "../../../utils/modals/Header";
 import AuthContext from "../../../context/AuthContext";
-import { api } from "../../../constants/constants";
 
 const UpdateStatusAndEmailModal = ({setStages,setStatus, status,showModal,setShowModal,resumeDetail,setResumeDetail }) => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -105,7 +104,7 @@ const UpdateStatusAndEmailModal = ({setStages,setStatus, status,showModal,setSho
 
     if (resumeDetail?.id) {
       try {
-        const response = await fetch(`${api}/resume_parser/resumes/${resumeDetail?.id}/`, {
+        const response = await fetch(`/resume_parser/resumes/${resumeDetail?.id}/`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",

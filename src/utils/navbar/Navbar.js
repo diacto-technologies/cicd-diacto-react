@@ -38,7 +38,7 @@ const Navbar = ({ mobileSidebarOpen, setMobileSidebarOpen }) => {
   return (
     <>
 
-      <nav className="fixed top-0 z-20 w-full bg-[rgb(27,46,105)] border-b border-gray-200  ">
+      <nav className="fixed top-0 z-30 w-full bg-[rgb(27,46,105)] border-b border-gray-200  ">
 
         <div className="px-3 py-2 lg:px-5 lg:pl-3">
 

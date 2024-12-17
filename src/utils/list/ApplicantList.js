@@ -6,8 +6,7 @@ import Header from "../modals/Header";
 import { useAssignAssessment, useFetchPreBuiltAssessments, useFetchUserOwnedAssessments } from "../../constants/test/constants";
 import { toast } from "react-toastify";
 import Switch2 from "../swtiches/Switch2";
-import Table from "../../utils/tables/Table";
-import DefaultUserImage from "../../assets/default_avatar.png"
+import Table from "../../utils/tables/Table";;
 
 const ApplicantList = ({
   updateStatus,
@@ -116,6 +115,14 @@ const ApplicantList = ({
         navigate(`/app/user/applicants/applicant/${candidate.id}/profile/overview/`);
       }
     },
+    // {
+    //   label: "Scores",
+    //   action: function (e, cell) {
+    //     let candidate = cell.getRow().getData();
+    //     // handleShareJob(job)
+    //   }
+    // },
+
   ]);
 
   // useEffect(() => {
@@ -203,16 +210,10 @@ const ApplicantList = ({
         // console.log(id)
       },
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: true, headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
+      headerFilter: true, headerFilterFunc: "like"
     },
     {
-      title: 'Resume Score', field: 'score', hozAlign: "center",vertAlign:"middle", minWidth: 120, headerSort: true,
+      title: 'Score', field: 'score', hozAlign: "left", sorter: scoreSorter, minWidth: 120, headerSort: true,
       titleFormatter: function (cell, formatterParams, onRendered) {
         return '<div class="column-container">' +
           `<label class="column-title">${cell.getValue()}</label>` +
@@ -221,13 +222,7 @@ const ApplicantList = ({
       // headerPopup: headerPopupFormatter,
       formatter: scoreFormatter,
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: true, headerFilterFunc: "in",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
+      headerFilter: true, headerFilterFunc: "in"
     },
     {
       title: 'Email', field: 'email', hozAlign: "left", sorter: "string", minWidth: 120, headerSort: false,
@@ -244,13 +239,7 @@ const ApplicantList = ({
       //  headerPopup: headerPopupFormatter,
       formatter: emailFormatter,
       //  headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: true, headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
+      headerFilter: true, headerFilterFunc: "like"
     },
     {
       title: 'Contact', field: 'contact', hozAlign: "left", sorter: "string", headerSort: false, minWidth: 120, headerSort: false,
@@ -261,13 +250,7 @@ const ApplicantList = ({
       },
       // headerPopup: headerPopupFormatter, 
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: true, headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
+      headerFilter: true, headerFilterFunc: "like"
     },
     {
       title: 'City', field: 'city', hozAlign: "left", minWidth: 120,
@@ -280,13 +263,7 @@ const ApplicantList = ({
       // headerPopup: headerPopupFormatter,
       formatter: cityFormatter,
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: true, headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "Filter by City", // Add a placeholder
-        },
-      },
+      headerFilter: true, headerFilterFunc: "like"
     },
     {
       title: 'State', field: 'state', hozAlign: "left", minWidth: 120,
@@ -299,13 +276,7 @@ const ApplicantList = ({
       // headerPopup: headerPopupFormatter,
       formatter: stateFormatter,
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: true, headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "Filter by State", // Add a placeholder
-        },
-      },
+      headerFilter: true, headerFilterFunc: "like"
     },
     {
       title: 'Relevant Experience', field: 'resume.total_duration', hozAlign: "left", sorter: expSorter, minWidth: 120,
@@ -317,52 +288,33 @@ const ApplicantList = ({
       // headerPopup: headerPopupFormatter, 
       formatter: expFormatter,
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: true, headerFilterFunc: "in",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "Filter by experience", // Add a placeholder
-        },
-      },
+      headerFilter: true, headerFilterFunc: "in"
     },
-    // {
-    //   title: 'Top Skills', field: 'skills', hozAlign: "left", sorter: "array", headerSort: false, minWidth: 150,
-    //   titleFormatter: function (cell, formatterParams, onRendered) {
-    //     return '<div class="column-container">' +
-    //       `<label class="column-title">${cell.getValue()}</label>` +
-    //       '</div>';
-    //   },
-    //   // headerPopup: headerPopupFormatter, 
-    //   formatter: skillsFormatter,
-    //   // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-    //   headerFilter: true, headerFilterFunc: "like"
-    // },
-    // {
-    //   title: 'Stage', field: 'stage', hozAlign: "left", sorter: "array", headerSort: false, minWidth: 150,
-    //   titleFormatter: function (cell, formatterParams, onRendered) {
-    //     return '<div class="column-container">' +
-    //       `<label class="column-title">${cell.getValue()}</label>` +
-    //       '</div>';
-    //   },
-    //   // headerPopup: headerPopupFormatter, 
-    //   formatter: skillsFormatter,
-    //   // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-    //   headerFilter: true, headerFilterFunc: "like"
-    // },
     {
-      title: 'Resume Status', field: 'resumes', hozAlign: "left", minWidth: 150, headerSort: false,
+      title: 'Top Skills', field: 'skills', hozAlign: "left", sorter: "array", headerSort: false, minWidth: 150,
+      titleFormatter: function (cell, formatterParams, onRendered) {
+        return '<div class="column-container">' +
+          `<label class="column-title">${cell.getValue()}</label>` +
+          '</div>';
+      },
+      // headerPopup: headerPopupFormatter, 
+      formatter: skillsFormatter,
+      // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
+      headerFilter: true, headerFilterFunc: "like"
+    },
+    {
+      title: 'Status', field: 'resumes', hozAlign: "left", minWidth: 150, headerSort: false,
       titleFormatter: function (cell, formatterParams, onRendered) {
         // Create the dropdown element
         let dropdownHTML = `
-        <div class="column-container ">
+        <div class="column-container">
             <label class="column-title">${cell.getColumn().getDefinition().title}</label>
-            <select id="status-dropdown" class="status-dropdown border w-full p-1 rounded-md my-1">
+            <select id="status-dropdown" class="status-dropdown">
                 <option value="">All</option>
                 <option value="Shortlisted">Shortlisted</option>
                 <option value="On Hold">On Hold</option>
                 <option value="Not Shortlisted">Not Shortlisted</option>
                 <option value="Under Review">Under Review</option>
-                <option value="Failed to Process">Failed to Process</option>
                 <!-- Add more options as needed -->
             </select>
         </div>`;
@@ -394,7 +346,7 @@ const ApplicantList = ({
       headerFilter: false, headerFilterFunc: "like"
     },
     {
-      title: 'Applied On', field: 'created_at', hozAlign: "left", minWidth: 120,
+      title: 'Applied On', field: 'updated_at', hozAlign: "left", minWidth: 120,
       // titleFormatter: function (cell, formatterParams, onRendered) {
       //     return '<div class="column-container">' +
       //         `<label class="column-title">${cell.getValue()}</label>` +
@@ -405,49 +357,7 @@ const ApplicantList = ({
         let datePickerHTML = `
                 <div class="column-container">
                     <label class="column-title">${cell.getColumn().getDefinition().title}</label>
-                    <input type="date" id="date-picker" class="date-picker border w-full p-1 rounded-md my-1" style="width: -webkit-fill-available;">
-                </div>
-            `;
-
-        // Attach event listener to the date picker after rendering
-        onRendered(() => {
-          const datePicker = document.getElementById("date-picker");
-          if (datePicker) {
-            datePicker.addEventListener("change", (event) => {
-              // const selectedDate = addTimeToDate(event.target.value);
-              const selectedDate = event.target.value;
-
-              // Trigger your custom action here
-              // Example: Filter the table by the selected date
-              if (selectedDate) {
-                cell.getTable().setFilter("created_at", "in", selectedDate);
-              } else {
-                cell.getTable().clearFilter("created_at"); // Clear the filter if no date is selected
-              }
-            });
-          }
-        });
-
-        return datePickerHTML;
-      }, // headerPopup: headerPopupFormatter, 
-      formatter: createdAtFormatter,
-      // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: emptyHeaderFilter,
-      // headerFilterFunc: dateFilter
-    },
-    {
-      title: 'Updated At', field: 'updated_at', hozAlign: "left", minWidth: 120,
-      // titleFormatter: function (cell, formatterParams, onRendered) {
-      //     return '<div class="column-container">' +
-      //         `<label class="column-title">${cell.getValue()}</label>` +
-      //         '</div>';
-      // }, 
-      titleFormatter: function (cell, formatterParams, onRendered) {
-        // Create the date picker HTML element
-        let datePickerHTML = `
-                <div class="column-container">
-                    <label class="column-title">${cell.getColumn().getDefinition().title}</label>
-                    <input type="date" id="date-picker" class="date-picker border w-full p-1 rounded-md my-1" style="width: -webkit-fill-available;">
+                    <input type="date" id="date-picker" class="date-picker" style="width: -webkit-fill-available;">
                 </div>
             `;
 
@@ -473,7 +383,7 @@ const ApplicantList = ({
         return datePickerHTML;
       },
       // headerPopup: headerPopupFormatter, 
-      formatter: updatedAtFormatter,
+      formatter: luxonDateDiffFormatter,
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
       headerFilter: emptyHeaderFilter,
       // headerFilterFunc: dateFilter
@@ -493,7 +403,17 @@ const ApplicantList = ({
     // Add more columns as needed
   ]);
 
+  function addTimeToDate(dateStr) {
+    // Create a Date object from the input date string
+    const date = new Date(`${dateStr}T00:00:00.037`); // Directly set the time as 07:33:58.037
 
+    // Format the date into the desired string format
+    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ` +
+      `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}.` +
+      `${String(date.getMilliseconds()).padStart(3, '0')}809`; // Adding "809" manually for microsecond precision
+
+    return formattedDate;
+  }
 
   const fieldMapping = {
     name: "name", // Example: AG Grid field 'name' maps to backend 'name'
@@ -502,7 +422,7 @@ const ApplicantList = ({
     'resume.total_duration': "resumes__relevant_experience_in_months",
     "city": "candidate_city",
     "state": "candidate_state",
-    "created_at": "latest_resume_created_at",
+    "updated_at": "updated_at",
     "resumes": "resumes__status_text"
     // Add more mappings as needed...
   };
@@ -609,7 +529,56 @@ const ApplicantList = ({
     // }
   }
 
- 
+
+
+  function noteFormatter(cell, formatterParams, onRendered) {
+    // Assuming job is a property of the row data
+    var job = cell.getRow().getData().job;
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+        </svg>`;
+  }
+
+  function skillsFilterFunction(value, data, filterParams) {
+    if (data && value) {
+      return data.some((skill) =>
+        skill.toLowerCase().includes(value.toLowerCase())
+      );
+    }
+  }
+
+  function relevantExpFilter(value, data, filterParams) {
+    return data === parseInt(value);
+  }
+
+  function dateFilter(value, data, filterParams) {
+    return new Date(data).toDateString() == new Date(value).toDateString();
+    // return data === parseInt(value)
+  }
+
+  function contactFormatter(cell, formatterParams, onRendered) {
+    const value = cell.getValue();
+    return value !== "" && value !== null && value !== undefined
+      ? value
+      : "no data";
+  }
+
+  function rankFormat(cell, formatterParams, onRendered) {
+    const position = cell.getRow()._row.position;
+    let rank;
+    if (position === 1) {
+      rank = `<div class="w-5  h-6 p-1 font-bold text-center rounded-md text-gray-500 bg-sky-300">${position}</div>`;
+    } else if (position > 1 && position <= 3) {
+      rank = `<div class="w-5 h-6 p-1 font-bold text-center  rounded-md text-gray-500 bg-green-300">${position}</div>`;
+    } else if (position > 3 && position <= 5) {
+      rank = `<div class="w-5 h-6 p-1 font-bold text-center  rounded-md text-gray-500 bg-yellow-300">${position}</div>`;
+    } else {
+      rank = `<div class="w-5 h-6 p-1 font-bold text-center  rounded-md text-gray-700 bg-gray-300">${position}</div>`;
+    }
+
+    return position ? rank : null;
+  }
 
   function openOutlook(toEmail) {
     // Specify the email address and subject
@@ -650,35 +619,19 @@ const ApplicantList = ({
     return container;
   }
 
-  function createdAtFormatter(cell, formatterParams, onRendered) {
+  function luxonDateDiffFormatter(cell, formatterParams, onRendered) {
     // const { inputFormat, units, humanize, invalidPlaceholder } = formatterParams;
-    const updated_at = cell.getRow().getData()?.resumes[0]?.created_at || null
-    const value = updated_at ?  new Date(updated_at).toDateString() : "";
-    return value;
-  }
-
-  function updatedAtFormatter(cell, formatterParams, onRendered) {
-    // const { inputFormat, units, humanize, invalidPlaceholder } = formatterParams;
-    const updated_at = cell.getRow().getData()?.resumes[0]?.updated_at || null
-    const value = updated_at ?  new Date(updated_at).toDateString() : "";
+    const value = new Date(cell.getValue()).toDateString();
     return value;
   }
 
   function linkFormatter(cell, formatterParams, onRendered) {
-    const data = cell.getRow().getData(); // Fetch the row data
-    const profilePic = data.profile_pic || DefaultUserImage; // Default placeholder
-    const name = cell.getValue(); // Get the cell value (candidate name)
-
-    return `
-        <div class="flex items-center gap-3 w-full">
-            <div class="w-8 min-w-8 h-8 rounded-full overflow-hidden border border-gray-300">
-                <img src="${profilePic}" alt="${name}" class="object-cover w-full h-full" />
-            </div>
-            <span class="text-gray-800 font-medium">${name}</span>
-            <i class="fa-solid fa-up-right-from-square text-blue-500"></i>
-        </div>
-    `;
-}
+    <i class="fa-solid fa-up-right-from-square"></i>;
+    return `<div class="">
+                <span class="me-2">${cell.getValue()}</span>
+                <i class="fa-solid fa-up-right-from-square text-blue-500"></i>
+            </div>`;
+  }
 
   function emailFormatter(cell, formatterParams, onRendered) {
     <i class="fa-solid fa-up-right-from-square"></i>;
@@ -740,7 +693,7 @@ function stateFormatter(cell, formatterParams, onRendered) {
 
   function expFormatter(cell, formatterParams, onRendered) {
     // console.log("Inside expFormatter: ", cell.getRow().getData().resumes)
-    const work_experience = cell.getRow().getData().resumes.length ? cell.getRow().getData().resumes[0].relevant_experience_in_months : ""; // Assuming 'services' is an array of service names
+    const work_experience = cell.getRow().getData().resumes[0]?.relevant_experience_in_months; // Assuming 'services' is an array of service names
     return work_experience ? work_experience : 0; // Join services into a string separated by commas
   }
 
@@ -752,7 +705,7 @@ function stateFormatter(cell, formatterParams, onRendered) {
 
   function scoreFormatter(cell, formatterParams, onRendered) {
     const applicant = cell.getRow().getData();
-    return `<label class="w-14 px-3 text-center font-semibold py-1 rounded-md bg-indigo-50 text-indigo-700">${ parseFloat(applicant.resumes[0]?.resume_score?.overall_score) || 0}</label>`;
+    return parseFloat(applicant.resumes[0]?.resume_score?.overall_score) || 0;
   }
 
   function scoreSorter(a, b, aRow, bRow, column, dir, sorterParams) {
@@ -777,7 +730,7 @@ function stateFormatter(cell, formatterParams, onRendered) {
       cell.getColumn()._column.field === "location"
         ? `<i class="fa-solid fa-map-pin me-2 text-sky-500"></i>`
         : null;
-    const items = cell.getRow().getData()?.resumes[0]?.skills; // Assuming 'services' is an array of service names
+    const items = cell.getRow().getData().resumes[0].skills; // Assuming 'services' is an array of service names
     // console.log("items: ", items, cell.getColumn())
     const badgeClass = "bg-sky-50 text-sky-700 ring-sky-600/20";
     const wrapper = document.createElement("div");
@@ -802,7 +755,7 @@ function stateFormatter(cell, formatterParams, onRendered) {
   }
 
   function statusFormatter(cell) {
-    const status_text = cell.getRow().getData()?.resumes[0]?.status_text; // If no skills, set to an empty array
+    const status_text = cell.getRow().getData().resumes[0].status_text; // If no skills, set to an empty array
 
     if (!status_text) {
       return <div>No data available</div>;
@@ -821,9 +774,6 @@ function stateFormatter(cell, formatterParams, onRendered) {
     if (status_text === "On Hold") {
       badgeClass = "bg-orange-500";
     }
-    if (status_text === "Failed To Process") {
-      badgeClass = "bg-red-500";
-    }
 
     // Map over the skills array and return a badge for each skill
     return (
@@ -838,7 +788,38 @@ function stateFormatter(cell, formatterParams, onRendered) {
     );
   }
 
- 
+  function shortListedFormatter(cell, formatterParams, onRendered) {
+    const value = cell.getValue(); // Assuming 'services' is an array of service names
+    const step = value.find((s) => s.service?.name === "Resume Screening");
+
+    let text = step?.statusText || "Under Review";
+
+    if (
+      step?.statusText === "Completed" ||
+      step?.statusText === "Not Started"
+    ) {
+      text = "Under Review";
+    }
+    if (step?.approved && step?.statusText !== "Shortlisted") {
+      text = "Shortlisted";
+    }
+
+    let badgeClass = "";
+    if (text === "Under Review") {
+      badgeClass = "bg-blue-50 text-blue-700 ring-blue-600/20";
+    }
+    if (text === "Shortlisted") {
+      badgeClass = "bg-green-50 text-green-700 ring-green-600/20";
+    }
+    if (text === "Not Shortlisted") {
+      badgeClass = "bg-gray-50 text-gray-800 ring-gray-600/20";
+    }
+    if (text === "On Hold") {
+      badgeClass = "bg-orange-50 text-orange-800 ring-orange-600/20";
+    }
+
+    return `<div class="me-2 inline-flex items-center rounded-md px-2 py-2 text-xs font-medium  ring-1 ring-inset ${badgeClass}">${text}</div>`; // Join services into a string separated by commas
+  }
 
   const shortlistAndAssignTest = async () => {
     //  await updateStatus("Shortlisted", params,subject,body,notifyCandidate);
@@ -862,7 +843,33 @@ function stateFormatter(cell, formatterParams, onRendered) {
     // setColumnDefs(prev => prev)
   }
 
-  
+  function updateButtonState(id) {
+    // console.log("button ", id)
+    const button = document.getElementById(`assign-test-${id}`);
+    if (button) {
+      // console.log("button ", button)
+      button.removeAttribute('disabled');
+      button.classList.remove('text-gray-300');
+      button.classList.add('text-gray-900');
+    }
+
+
+    // } else {
+    //     button.setAttribute('disabled', true);
+    //     button.classList.remove('text-gray-900');
+    //     button.classList.add('text-gray-300');
+    // }
+  }
+
+  // const handleCheckboxChange = (event, item, type) => {
+  //   if (event.target.checked) {
+  //     // Add the selected assessment ID to the state
+  //     setSelectedAssessments([...selectedAssessments, { ...item, type: type }]);
+  //   } else {
+  //     // Remove the unselected assessment ID from the state
+  //     setSelectedAssessments(selectedAssessments.filter((assessment) => assessment.id !== item.id));
+  //   }
+  // };
   const handleCheckboxChange = (event, item, type) => {
     if (event.target.checked) {
       if (type === "prebuilt-assessment") {
@@ -923,7 +930,7 @@ function stateFormatter(cell, formatterParams, onRendered) {
   return (
     <>
       <div
-        className="overflow-auto rounded-xl border"
+        className="overflow-auto rounded-xl"
         style={{ height: "calc(100vh - 445px)" }}
       >
         <Table url={url} setTableInstance={setTableInstance} columns={columns} data={applicants} fieldMapping={fieldMapping} setTableRowCount={setTableRowCount} />

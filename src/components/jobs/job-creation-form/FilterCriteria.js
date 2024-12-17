@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { api, selectStyle, selectTheme } from "../../../constants/constants";
+import { selectStyle, selectTheme } from "../../../constants/constants";
 import Select from "react-select";
-import { StopCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import Accordion from "../Accordion";
 import { json } from "react-router-dom";
 
-const FilterCriteria = ({ criteria, setCriteria }) => {
+const FilterCriteria = ({criteria, setCriteria}) => {
+
+  console.log(criteria)
+
   const responseFormats = [
     { value: "dropdown", label: "Dropdown" },
     { value: "radio", label: "Radio" },
@@ -18,12 +21,10 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
     setCriteria([
       ...criteria,
       {
-        id: null, // New criteria will have no ID initially
         question: "",
         response_type: "dropdown",
         options: [],
-        expected_response: [],
-        isUpdated: true,
+        expected_response: [], // Allow multiple expected responses for multi-checkbox
       },
     ]);
   };
@@ -32,18 +33,17 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
   const updateQuestion = (index, value) => {
     const newCriteria = [...criteria];
     newCriteria[index].question = value;
-    newCriteria[index].isUpdated = true; // Mark as updated
     setCriteria(newCriteria);
   };
 
   // Update response type
   const updateResponseType = (index, selectedOption) => {
     const newCriteria = [...criteria];
+
     newCriteria[index].response_type = selectedOption?.value;
-    newCriteria[index].options = []; // Reset options for new type
+    newCriteria[index].options = []; // reset options for new type
     newCriteria[index].expected_response =
-      selectedOption?.value === "checkbox" ? [] : ""; // Reset expected response
-    newCriteria[index].isUpdated = true; // Mark as updated
+      selectedOption?.value === "checkbox" ? [] : ""; // reset expected response
     setCriteria(newCriteria);
   };
 
@@ -51,15 +51,6 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
   const addOption = (index) => {
     const newCriteria = [...criteria];
     newCriteria[index].options.push("");
-    newCriteria[index].isUpdated = true; // Mark as updated
-    setCriteria(newCriteria);
-  };
-
-  // Remove option from question criterion
-  const deleteOption = (criterionIndex, optionIndex) => {
-    const newCriteria = [...criteria];
-    newCriteria[criterionIndex].options.splice(optionIndex, 1);
-    newCriteria[criterionIndex].isUpdated = true; // Mark as updated
     setCriteria(newCriteria);
   };
 
@@ -67,16 +58,16 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
   const updateOption = (criterionIndex, optionIndex, value) => {
     const newCriteria = [...criteria];
     newCriteria[criterionIndex].options[optionIndex] = value;
-    newCriteria[criterionIndex].isUpdated = true; // Mark as updated
     setCriteria(newCriteria);
   };
 
-  // Set expected response
+  // Set expected response (for multi-checkbox it can accept multiple values)
   const setExpectedResponse = (index, value) => {
     const newCriteria = [...criteria];
     const criterion = newCriteria[index];
 
     if (criterion.response_type === "checkbox") {
+      // Toggle selection for multi-checkbox
       if (criterion.expected_response.includes(value)) {
         criterion.expected_response = criterion.expected_response.filter(
           (v) => v !== value
@@ -88,34 +79,14 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
       criterion.expected_response = value;
     }
 
-    criterion.isUpdated = true; // Mark as updated
     setCriteria(newCriteria);
   };
 
   // Remove criterion
-  const removeCriterion = async (index, id) => {
+  const removeCriterion = (index) => {
     const newCriteria = [...criteria];
     newCriteria.splice(index, 1);
     setCriteria(newCriteria);
-
-    if (id) {
-      const url = `${api}/jobs/criteria/${id}/`;
-      try {
-        const response = await fetch(url, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ is_deleted: true }),
-        });
-
-        if (!response.ok) {
-          console.error("Failed to delete criterion");
-        }
-      } catch (error) {
-        console.error("Network error:", error);
-      }
-    }
   };
 
   function handleDelete() {
@@ -124,13 +95,14 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
 
   return (
     <div className="w-full flex flex-col gap-4">
+      {/* <h2>Custom Preferences</h2> */}
       {criteria.map((criterion, index) => (
         <Accordion
           key={index}
           title={criterion.question || "New Criteria"}
-          onDelete={() => removeCriterion(index, criterion.id)}
+          onDelete={() => removeCriterion(index)}
         >
-          <div className="flex flex-col gap-4 px-6 py-4 bg-white text-gray-700">
+          <div className="flex flex-col gap-4 px-6 py-4 bg-white text-gray-700 ">
             <input
               type="text"
               placeholder="Question"
@@ -159,26 +131,16 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
               <div>
                 <h4 className="mb-2">Options:</h4>
                 {criterion.options.map((option, optIndex) => (
-                  <div key={optIndex} className="flex items-center gap-2 mb-2">
-                    <input
-                      type="text"
-                      placeholder={`Option ${optIndex + 1}`}
-                      value={option}
-                      onChange={(e) =>
-                        updateOption(index, optIndex, e.target.value)
-                      }
-                      className="border p-2 rounded-md w-full"
-                    />
-                    <button
-                      onClick={() => deleteOption(index, optIndex)}
-                      className=""
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="red" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                      </svg>
-
-                    </button>
-                  </div>
+                  <input
+                    key={optIndex}
+                    type="text"
+                    placeholder={`Option ${optIndex + 1}`}
+                    value={option}
+                    onChange={(e) =>
+                      updateOption(index, optIndex, e.target.value)
+                    }
+                    className="border p-2 rounded-md mb-2 w-full"
+                  />
                 ))}
                 <button
                   onClick={() => addOption(index)}
@@ -202,7 +164,6 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
               </select>
             ) : criterion.response_type === "checkbox" ? (
               criterion.options.map((option, optIndex) => (
-                option &&
                 <label key={optIndex} className="block mb-1">
                   <input
                     type="checkbox"
@@ -221,7 +182,6 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
               >
                 <option value="">Select Expected Response</option>
                 {criterion.options.map((option, optIndex) => (
-                  option &&
                   <option key={optIndex} value={option}>
                     {option}
                   </option>
@@ -238,6 +198,8 @@ const FilterCriteria = ({ criteria, setCriteria }) => {
       >
         Add Filter Criteria
       </button>
+
+      {/* <pre>{JSON.stringify(criteria,null,2)}</pre> */}
     </div>
   );
 };

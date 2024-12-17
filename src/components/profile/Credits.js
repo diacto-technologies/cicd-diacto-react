@@ -11,10 +11,10 @@ const Credits = () => {
         <>
             {
                 userDetails &&
-                <div className="w-full flex">
+                <div className="h-screen w-full flex">
                     {/* sidebar  */}
-                    {/* <div className="w-1/6"><ProfileNavbar /></div> */}
-                    <div className="w-full h-full flex flex-col justify-center items-center overflow-auto"  style={{ height: 'calc(100dvh - 57px)' }}>
+                    <ProfileNavbar />
+                    <div className="w-5/6 h-full flex flex-col justify-center items-center ">
                         <i className={`fa-solid fa-lock text-gray-700 w-8 text-center p-1 text-xl`}></i>
                         <label className="text-2xl text-gray-600 mb-1">Coming Soon</label>
                         <p className="text-gray-500">We'll notify you once this feature is rolled out.</p>

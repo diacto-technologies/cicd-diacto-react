@@ -18,7 +18,6 @@ import {
 import DownloadTemplateButton from "./excel-upload/DownloadTemplateButton";
 import axios from "axios";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import { api } from "../../constants/constants";
 
 const TestViewer = () => {
     const navigate = useNavigate();
@@ -130,7 +129,7 @@ const TestViewer = () => {
 
   async function deleteQuestion() {
     // Replace 'http://example.com/api/interviews/' with your actual API endpoint
-    const apiUrl = `${api}/test/questions/${selectedQuestion.id}/`;
+    const apiUrl = `/test/questions/${selectedQuestion.id}/`;
 
     // Headers to be included in the request
     const headers = {
@@ -245,7 +244,7 @@ const TestViewer = () => {
     }
 
     // Replace 'http://example.com/api/interviews/' with your actual API endpoint
-    const apiUrl = `${api}/test/questions/${selectedQuestion.id}/`;
+    const apiUrl = `/test/questions/${selectedQuestion.id}/`;
 
     // Headers to be included in the request
     const headers = {
@@ -314,7 +313,7 @@ const TestViewer = () => {
     }
 
     // Replace 'http://example.com/api/interviews/' with your actual API endpoint
-    const apiUrl = `${api}/test/questions/`;
+    const apiUrl = "/test/questions/";
 
     // Headers to be included in the request
     const headers = {
@@ -364,7 +363,7 @@ const TestViewer = () => {
     // Replace 'http://example.com/api/interviews/' with your actual API endpoint
     // const apiUrl = `/test/prebuiltassessments/${testId}/`;
     const path =  assessmentType === "test" ? "tests" : assessmentType === "prebuilt-assessment" ? "prebuiltassessments" : ""
-    const apiUrl = `${api}/test/${path}/${testId}/`;
+    const apiUrl = `/test/${path}/${testId}/`;
 
     // Headers to be included in the request
     const headers = {
@@ -410,7 +409,7 @@ const TestViewer = () => {
 
   async function getDifficulties() {
     // Replace 'http://example.com/api/interviews/' with your actual API endpoint
-    const apiUrl = `${api}/test/difficulties/`;
+    const apiUrl = `/test/difficulties/`;
 
     // Headers to be included in the request
     const headers = {
@@ -623,7 +622,7 @@ const TestViewer = () => {
   const fetchQuestionSet = async () => {
     try {
       setQuestionSetLoading(true);
-      const response = await fetch(`${api}/interview/question-sets/`, {
+      const response = await fetch(`/interview/question-sets/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

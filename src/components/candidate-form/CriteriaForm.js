@@ -1,10 +1,19 @@
 import CandidateCriteriaForm from "./CandidateCriteriaForm";
 
-const CriteriaForm = ({jobId, setFormValidationResponse, criteriaResponses, setCriteriaResponses, criteriaErrors}) => {
+const CriteriaForm = ({jobId}) => {
 
     const handleSubmitResponses = async (responses) => {
         const url = '/candidate-responses/bulk-create-or-update/';
-        
+        const payload = {
+        //   candidate_id: candidateId,
+          job_id: jobId,
+          responses: Object.entries(responses).map(([criteriaId, response]) => ({
+            criteria_id: criteriaId,
+            response: response,
+          })),
+        };
+
+        console.log(payload)
     
         // try {
         //   const response = await fetch(url, {
@@ -30,7 +39,7 @@ const CriteriaForm = ({jobId, setFormValidationResponse, criteriaResponses, setC
 
     return ( 
         <>
-        <CandidateCriteriaForm jobId={jobId} criteriaResponses={criteriaResponses} setCriteriaResponses={setCriteriaResponses} onSubmit={(responses) => {handleSubmitResponses(responses)}} setFormValidationResponse={setFormValidationResponse} criteriaErrors={criteriaErrors} />
+        <CandidateCriteriaForm jobId={jobId} onSubmit={(responses) => {handleSubmitResponses(responses)}} />
         </>
      );
 }

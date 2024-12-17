@@ -4,7 +4,6 @@ import { useContext, useEffect, useState } from "react";
 import SpinLoader from "../../utils/loaders/SpinLoader";
 import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
-import { api } from "../../constants/constants";
 
 const Tour = () => {
     // const {  userDetails } = useContext(AuthContext);
@@ -65,7 +64,7 @@ const Tour = () => {
         };
     
         try {
-            const response = await fetch(`${api}/personality-screening/personality-screenings/${screeningId}/`, {
+            const response = await fetch(`/personality-screening/personality-screenings/${screeningId}/`, {
                 method: "PATCH",
                 headers: headers,
                 body: JSON.stringify({
@@ -102,7 +101,7 @@ const Tour = () => {
             try {
                 const [screeningResponse] = await Promise.all([
 
-                    fetch(`${api}/personality-screening/personality-screenings/${screeningId}/`, {
+                    fetch(`/personality-screening/personality-screenings/${screeningId}/`, {
                         method: "GET",
                         headers: headers,
                     })
@@ -123,8 +122,11 @@ const Tour = () => {
 
 
                 setScreeningDetails(screeningData)
-                if (screeningData &&  (!screeningData.started && !screeningData.link_opened)) {
+                if (screeningData && !screeningData.link_opened) {
                     markLinkOpened(screeningData.id)
+                }else{
+                    setIsCompleted(true)
+                    setCompletedText("We have already received your response.")
                 }
                 if (screeningData && screeningData.completed && screeningData?.step?.completed) {
 
@@ -177,8 +179,8 @@ const Tour = () => {
 
                                         <figure class="mt-10">
                                             <blockquote class="text-center text-2xl font-semibold leading-8 text-gray-900 sm:text-3xl sm:leading-9">
-                                                <p className="text-3xl text-white" >{completedText}</p>
-                                                <p className="text-base text-gray-100 mt-5">Our team will update you with further steps.</p>
+                                                <p className="text-3xl" >{completedText}</p>
+                                                <p className="text-base text-gray-500 mt-5">Our team will update you with further steps.</p>
                                             </blockquote>
 
                                         </figure>

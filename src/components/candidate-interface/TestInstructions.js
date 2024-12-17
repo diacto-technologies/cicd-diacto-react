@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import TestEnd from "./TestEnd";
 import { useNavigate, useParams } from "react-router-dom";
-import { api, currentDate } from "../../constants/constants";
+import { currentDate } from "../../constants/constants";
 import LinkExpired from "./LinkExpired";
 
 const TestInstructions = () => {
@@ -47,7 +47,7 @@ const TestInstructions = () => {
     // console.log(CompleteTime, 'called');
 
     try {
-      const response = await fetch(`${api}/test/testlog/${pk}/`, {
+      const response = await fetch(`/test/testlog/${pk}/`, {
         method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -68,7 +68,7 @@ const TestInstructions = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${api}/test/test-status/?test_log=${testlogId}`, {
+      const response = await fetch(`/test/test-status/?test_log=${testlogId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -77,6 +77,7 @@ const TestInstructions = () => {
         throw new Error(`Network response was not ok: ${response.statusText}`);
 
       const data = await response.json();
+      // console.log('Test status data:', data);
 
       if (data) {
         setTestGroupData(data[0]?.test_log);
@@ -98,10 +99,9 @@ const TestInstructions = () => {
             ? new Date(data[0].test_log.valid_to)
             : null;
 
-          console.log(data[0]?.test_log.valid_from,data[0]?.test_log.valid_to)
+
           setValidFrom(validFrom);
           setValidTo(validTo);
-
           if (validFrom && validTo) {
             setIsValid(currentDate > validFrom && currentDate < validTo);
           } else {
@@ -124,7 +124,7 @@ const TestInstructions = () => {
           setRemainingTests(updatedRemainingTests);
         } else {
           navigate(
-            `/app/candidate/${candidateId}/test/${testlogId}/${uniqueId}/completed/204/`
+            `/app/candidate/${candidateId}/test/${testlogId}/${uniqueId}/completed/`
           );
         }
 
@@ -203,7 +203,12 @@ const TestInstructions = () => {
               </div>
 
               <div className="min-h-screen w-full md:hidden flex items-center justify-center bg-gradient-to-b from-[#7474f4] to-[#a5a5fa] px-6 py-12 relative overflow-hidden">
-               
+                {/* <h1 className="text-4xl font-bold text-white">CandidHR</h1>
+                <h2 className="text-xl text-purple-500 mt-4">API Playground</h2>
+                <p className="text-gray-300 mt-2 text-center">
+                  CandidHr's test ui is best experienced on large screens. Try using a computer/laptop or
+                  widening your browser window.
+                </p> */}
                 <div className="relative z-10 bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-3xl p-8">
                   <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
                     CandidHR

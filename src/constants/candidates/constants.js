@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import AuthContext from "../../context/AuthContext";
-import { api } from "../constants";
 
 // Custom hook for fetching applicants
 export const useFetchApplicants = () => {
@@ -8,23 +7,20 @@ export const useFetchApplicants = () => {
     const [loadingApplicants, setLoadingApplicants] = useState(false);
     const [candidateOptions, setCandidateOptions] = useState([])
     // Function to fetch applicants
-    const fetchApplicants = async (name, jobId,shortlisted) => {
+    const fetchApplicants = async (name, jobId) => {
         try {
             // Build the base endpoint
-            let endpoint = `${api}/candidates/candidate-names-list/`;
-            console.log(shortlisted)
+            let endpoint = `/candidates/candidate-names-list/`;
+    
             // Append name filter if provided
             if (name) {
                 endpoint += `?name=${encodeURIComponent(name)}`;
-            }
-            if (shortlisted) {
-                endpoint += endpoint.includes("?") ?  `&shortlisted=true` : "?shortlisted=true";
             }
     
             // Append jobId filter if provided
             if (jobId) {
                 // If `name` is already in the query string, append `jobId` with `&`
-                endpoint += endpoint.includes("?") ? `&jobId=${encodeURIComponent(jobId)}` : `?jobId=${encodeURIComponent(jobId)}`;
+                endpoint += name ? `&jobId=${encodeURIComponent(jobId)}` : `?jobId=${encodeURIComponent(jobId)}`;
             }
     
             setLoadingApplicants(true);

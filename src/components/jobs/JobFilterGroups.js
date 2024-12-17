@@ -10,7 +10,6 @@ import Switch from "../../utils/swtiches/Switch";
 import { useParams } from "react-router-dom";
 import { Tooltip } from 'react-tooltip'
 import SpinLoader from "../../utils/loaders/SpinLoader";
-import { api } from "../../constants/constants";
 
 const JobFilterGroups = () => {
     const { jobId } = useParams();
@@ -97,7 +96,7 @@ const JobFilterGroups = () => {
         //console.log("fetching dataset")
         try {
             setLoading(true)
-            const response = await fetch(`${api}/jobs/filter-group/`,
+            const response = await fetch(`/jobs/filter-group/`,
                 {
                     method: "GET",
                     headers: {
@@ -279,7 +278,7 @@ const JobFilterGroups = () => {
             return;
         }
 
-        const jobFormUrl = editMode ? `${api}/jobs/filter-group/${filterGroups.id}/` : `${api}/jobs/filter-group/`
+        const jobFormUrl = editMode ? `/jobs/filter-group/${filterGroups.id}/` : `/jobs/filter-group/`
         try {
             const response = await fetch(jobFormUrl, {
                 method: editMode ? 'PUT' : 'POST',
@@ -524,7 +523,7 @@ const JobFilterGroups = () => {
     }
 
     const deleteFilterGroup = async (group, row) => {
-        const jobFormUrl = `${api}/jobs/filter-group/${group.id}/`
+        const jobFormUrl = `/jobs/filter-group/${group.id}/`
         try {
 
             row.delete().then(function () {

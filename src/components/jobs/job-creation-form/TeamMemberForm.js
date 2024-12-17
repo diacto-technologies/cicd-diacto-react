@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../../../context/AuthContext";
-import { api, selectStyle, selectTheme } from "../../../constants/constants";
+import { selectStyle, selectTheme } from "../../../constants/constants";
 import Select, { components } from "react-select";
 
 
@@ -21,18 +21,16 @@ function TeamMemberForm({ formSteps, currentStep, setCurrentStep, navigateToStep
 
   useEffect(() => {
     // if(formData.id) 
-    if (userDetails) {
-      fetchUsers();
-    }
+    fetchUsers();
     fetchJob(jobId);
-  }, [userDetails])
+  }, [])
 
   async function fetchUsers() {
     // console.log("Fetching users", userDetails);
     try {
       //   setUsersLoading(true);
       const response = await fetch(
-        `${api}/accounts/organizations/${userDetails?.org?.org_id}/users/`,
+        `/accounts/organizations/${userDetails?.org?.org_id}/users/`,
         {
           method: "GET",
           headers: {
@@ -74,7 +72,7 @@ function TeamMemberForm({ formSteps, currentStep, setCurrentStep, navigateToStep
     //console.log("fetching dataset")
     setLoading(true)
     try {
-      const response = await fetch(`${api}/jobs/job/${jobId}/`,
+      const response = await fetch(`/jobs/job/${jobId}/`,
         {
           method: "GET",
           headers: {
@@ -123,23 +121,15 @@ function TeamMemberForm({ formSteps, currentStep, setCurrentStep, navigateToStep
       //console.log(prev)
       return prev.filter((member) => member.id !== id) || []
     })
-    handleShareJob(id);
   }
 
   // called by share button is clicked
-  const handleShareJob = async (id) => {
+  const handleShareJob = async () => {
     //console.log(selectedMembersData)
     setDisabled(true)
-    let formattedData
-    if (id) {
-      let validMembers = selectedMembersData.filter(member => member.id !== id)
-      formattedData = `{"users_shared_with":[${validMembers.map((member) => member.id)}]}`
-    }
-    else {
-      formattedData = `{"users_shared_with":[${selectedMembersData.map((member) => member.id)}]}`
-    }
+    const formattedData = `{"users_shared_with":[${selectedMembersData.map((member) => member.id)}]}`
     try {
-      const response = await fetch(`${api}/jobs/job/${jobId}/`,
+      const response = await fetch(`/jobs/job/${jobId}/`,
         {
           method: "PATCH",
           headers: {
@@ -228,9 +218,9 @@ function TeamMemberForm({ formSteps, currentStep, setCurrentStep, navigateToStep
                     </div>
                   </div>
 
-                  <span className="self-center text-slate-500 text-sm font-medium">
+                  {/* <span className="self-center font-medium">
                     {member.role?.name}
-                  </span>
+                  </span> */}
 
                   <i className="fa-solid fa-trash self-center text-[#7076f2] cursor-pointer" onClick={() => removemember(member.id)}></i>
                 </div>
@@ -262,7 +252,7 @@ function TeamMemberForm({ formSteps, currentStep, setCurrentStep, navigateToStep
 
         <div className="px-16 py-6 flex justify-end gap-3">
           {currentStep !== 1 && <button onClick={() => navigateToStep(currentStep - 1)} className="border rounded-md px-6 py-2">Back</button>}
-          {/* {currentStep !== formSteps.length && <button onClick={() => navigateToStep(currentStep + 1)} className="border rounded-md px-6 py-2">Next</button>} */}
+          {currentStep !== formSteps.length && <button onClick={() => navigateToStep(currentStep + 1)} className="border rounded-md px-6 py-2">Next</button>}
           {currentStep !== formSteps.length && <button onClick={handleShareJob} className="border bg-brand-purple text-white rounded-md px-6 py-2" disabled={disabled}>Share</button>}
         </div>
       </div>

@@ -7,7 +7,6 @@ const AuthContext = createContext()
 export default AuthContext;
 
 export const AuthProvider = ({ children }) => {
-    const api = process.env.REACT_APP_API_URL
 
     // localStorage.getItem('authTokens') 
 
@@ -19,7 +18,6 @@ export const AuthProvider = ({ children }) => {
     const [loadingDetails, setLoadingDetails] = useState(false)
     const [orgServices, setOrgServices] = useState([])
     const [isSuperUser, setIsSuperUser] = useState(false)
-    const [isSuperAdmin,setIsSuperAdmin] =useState(false)
     const history = useNavigate()
     const location = useLocation();
     
@@ -28,8 +26,6 @@ export const AuthProvider = ({ children }) => {
             history('/app/user/jobs/')
         }
     }, [location])
-
-
 
 
     useEffect(() => {
@@ -49,15 +45,12 @@ export const AuthProvider = ({ children }) => {
                     if (details) {
                         setIsSuperUser(details?.is_superuser &&
                             details?.org?.org_domain === "candidhr.ai")
-                        setIsSuperAdmin(details?.is_superadmin )
                         setUserDetails(details);
                     }
                 })
                 .catch(error => console.error('Error fetching details:', error));
         }
     }, [authTokens, userDetails, loadingDetails]);
-
-   
 
     useEffect(() => {
 
@@ -77,7 +70,7 @@ export const AuthProvider = ({ children }) => {
     const getUserDetails = async (token) => {
         setLoadingDetails(true)
         if (!userDetails ) {
-            let response = await fetch(`${api}/accounts/user/`, {
+            let response = await fetch('/accounts/user/', {
                 method: 'GET',
                 headers: {
                     "Content-Type": "application/json",
@@ -104,9 +97,9 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
-    const loginUser = async (e,role) => {
+    const loginUser = async (e) => {
         e.preventDefault()
-        let response = await fetch(`${api}/accounts/token/`, {
+        let response = await fetch('/accounts/token/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -130,12 +123,8 @@ export const AuthProvider = ({ children }) => {
                 history(redirectTo)
  
             } else {
-                if (role === "admin") {
-                    history('/app/admin/demos/')
-                }else{
-                    history('/app/user/jobs/')
-                }
-                
+                history('/app/user/jobs/')
+ 
             }
         } else {
             throw data;
@@ -155,7 +144,7 @@ export const AuthProvider = ({ children }) => {
 
         
 
-        let response = await fetch(`${api}/accounts/token/refresh/`, {
+        let response = await fetch('/accounts/token/refresh/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -195,8 +184,7 @@ export const AuthProvider = ({ children }) => {
         teamMembersAvatars : teamMembersAvatars,
         setTeamMembersAvatars, setTeamMembersAvatars,
         orgServices : orgServices,
-        isSuperUser: isSuperUser,
-        isSuperAdmin : isSuperAdmin
+        isSuperUser: isSuperUser
         // domain : "http://localhost:3000"
         // domain : "https://candidhr.ai"
     }

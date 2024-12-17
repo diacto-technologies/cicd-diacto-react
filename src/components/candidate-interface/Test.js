@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import Questionnaire from "../candidate-form/Questionnaire";
 import LinkExpired from "./LinkExpired";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { api } from "../../constants/constants";
 
 const Test = () => {
   const { testlogId, candidateId, uniqueId, assessmentType, testId } = useParams();
@@ -26,7 +25,6 @@ const Test = () => {
   const [proctoringId, setProctoringId] = useState(null)
   const [showFullScreenModal, setShowFullScreenModal] = useState(false)
   const [showTabChangeModal, setShowTabChangeModal] = useState(false)
-  const [proctoringActive, setProctoringActive] = useState(true); // Tracks whether listeners should remain active
 
   useEffect(() => {
     fetchTestStatus();
@@ -71,117 +69,38 @@ const Test = () => {
   }, []);
 
 
-  // useEffect(() => {
-  //   const handleFullscreenChange = () => {
-  //     // Check if the document is no longer in fullscreen mode
-  //     if (!document.fullscreenElement) {
-  //       setFullscreenExitCount((prevCount) => prevCount + 1);
-  //       setShowFullScreenModal(true)
-  //       // proctorTest(fullscreenExitCount + 1, tabSwitchCount);
-  //       if (localStorage.getItem('proctor')) {
-  //         console.log('Proctor exists in local storage');
-  //         const proctorData = JSON.parse(localStorage.getItem('proctor'))
-  //         proctorData.fullscreenExitCount += 1
-  //         proctorTest(proctorData.fullscreenExitCount, proctorData.tabSwitchCount)
-  //         localStorage.setItem('proctor', JSON.stringify(proctorData))
-  //       } else {
-  //         console.log('Proctor does not exist');
-  //         const proctorData = { fullscreenExitCount: 1, tabSwitchCount: 0 };
-  //         localStorage.setItem('proctor', JSON.stringify(proctorData));
-  //         proctorTest(proctorData.fullscreenExitCount, proctorData.tabSwitchCount)
-  //       }
-  //     }
-  //     else {
-  //       setShowFullScreenModal(false)
-  //     }
-  //   };
-
-  //   const handleVisibilityChange = () => {
-  //     // Check if the tab becomes hidden
-  //     if (document.visibilityState === 'hidden') {
-  //       setTabSwitchCount((prevCount) => prevCount + 1);
-  //       setShowTabChangeModal(true)
-  //       // proctorTest(fullscreenExitCount, tabSwitchCount + 1);
-  //       if (localStorage.getItem('proctor')) {
-  //         console.log('Proctor exists in local storage');
-  //         const proctorData = JSON.parse(localStorage.getItem('proctor'))
-  //         proctorData.tabSwitchCount += 1
-  //         proctorTest(proctorData.fullscreenExitCount, proctorData.tabSwitchCount)
-  //         localStorage.setItem('proctor', JSON.stringify(proctorData))
-  //       } else {
-  //         console.log('Proctor does not exist');
-  //         const proctorData = { fullscreenExitCount: 0, tabSwitchCount: 1 };
-  //         localStorage.setItem('proctor', JSON.stringify(proctorData));
-  //         proctorTest(proctorData.fullscreenExitCount, proctorData.tabSwitchCount)
-  //       }
-  //     }
-  //   };
-
-  //   if (proctoringActive) {
-  //     // Add event listeners only if proctoring is active
-  //     document.addEventListener('fullscreenchange', handleFullscreenChange);
-  //     document.addEventListener('visibilitychange', handleVisibilityChange);
-  //   }
-
-  //   // Cleanup event listeners on component unmount
-  //   return () => {
-  //     document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  //     document.removeEventListener('visibilitychange', handleVisibilityChange);
-  //   };
-  // }, [fullscreenExitCount, tabSwitchCount, proctoringId, proctoringActive]);
-
-  const removeListeners = () => {
-    document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-    console.log('Event listeners removed');
-  };
-
-  const handleFullscreenChange = () => {
-    if (!document.fullscreenElement) {
-      setFullscreenExitCount((prevCount) => prevCount + 1);
-      setShowFullScreenModal(true);
-      if (localStorage.getItem('proctor')) {
-        const proctorData = JSON.parse(localStorage.getItem('proctor'));
-        proctorData.fullscreenExitCount += 1;
-        proctorTest(proctorData.fullscreenExitCount, proctorData.tabSwitchCount);
-        localStorage.setItem('proctor', JSON.stringify(proctorData));
-      } else {
-        const proctorData = { fullscreenExitCount: 1, tabSwitchCount: 0 };
-        localStorage.setItem('proctor', JSON.stringify(proctorData));
-        proctorTest(proctorData.fullscreenExitCount, proctorData.tabSwitchCount);
-      }
-    }
-  };
-
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === 'hidden') {
-      setTabSwitchCount((prevCount) => prevCount + 1);
-      setShowTabChangeModal(true);
-      if (localStorage.getItem('proctor')) {
-        const proctorData = JSON.parse(localStorage.getItem('proctor'));
-        proctorData.tabSwitchCount += 1;
-        proctorTest(proctorData.fullscreenExitCount, proctorData.tabSwitchCount);
-        localStorage.setItem('proctor', JSON.stringify(proctorData));
-      } else {
-        const proctorData = { fullscreenExitCount: 0, tabSwitchCount: 1 };
-        localStorage.setItem('proctor', JSON.stringify(proctorData));
-        proctorTest(proctorData.fullscreenExitCount, proctorData.tabSwitchCount);
-      }
-    }
-  };
-
   useEffect(() => {
-    if (proctoringActive) {
-      // Add event listeners if proctoring is active
-      document.addEventListener('fullscreenchange', handleFullscreenChange);
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-    }
-
-    // Cleanup function to ensure listeners are removed when proctoring becomes inactive
-    return () => {
-      removeListeners();
+    const handleFullscreenChange = () => {
+      // Check if the document is no longer in fullscreen mode
+      if (!document.fullscreenElement) {
+        setFullscreenExitCount((prevCount) => prevCount + 1);
+        setShowFullScreenModal(true)
+        proctorTest(fullscreenExitCount + 1, tabSwitchCount);
+      }
+      else {
+        setShowFullScreenModal(false)
+      }
     };
-  }, [fullscreenExitCount, tabSwitchCount, proctoringId, proctoringActive]); // Depend on proctoringActive
+
+    const handleVisibilityChange = () => {
+      // Check if the tab becomes hidden
+      if (document.visibilityState === 'hidden') {
+        setTabSwitchCount((prevCount) => prevCount + 1);
+        setShowTabChangeModal(true)
+        proctorTest(fullscreenExitCount, tabSwitchCount + 1);
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [fullscreenExitCount, tabSwitchCount, proctoringId]);
 
   const proctorTest = async (fullscreenExitCount, tabSwitchCount) => {
 
@@ -193,7 +112,7 @@ const Test = () => {
 
     if (proctoringId) {
       try {
-        const response = await fetch(`${api}/test/proctoring/${proctoringId}/`, {
+        const response = await fetch(`/test/proctoring/${proctoringId}/`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -236,7 +155,7 @@ const Test = () => {
   const fetchTestStatus = async () => {
     try {
       // Fetch the test status data
-      const response = await fetch(`${api}/test/test-status/?test_log=${testlogId}`);
+      const response = await fetch(`/test/test-status/?test_log=${testlogId}`);
       if (!response.ok) throw new Error("Failed to fetch test data");
 
       // Parse the JSON response
@@ -284,7 +203,7 @@ const Test = () => {
   const fetchTestQuestions = async (testId, assessmentType, questionCount, randomizeQuestion) => {
     // console.log("FetchTestquestion Called")
     try {
-      const response = await fetch(`${api}/test/assessment-questions/?test_id=${testId}&type=${assessmentType}&question_count=${questionCount}&randomize_question=${randomizeQuestion}`);
+      const response = await fetch(`/test/assessment-questions/?test_id=${testId}&type=${assessmentType}&question_count=${questionCount}&randomize_question=${randomizeQuestion}`);
       if (!response.ok) throw new Error("Failed to fetch test data");
       const data = await response.json();
       // console.log(data.questions,'questions')
@@ -313,7 +232,7 @@ const Test = () => {
 
 
     try {
-      const response = await fetch(`${api}/test/result/`, {
+      const response = await fetch(`/test/result/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -324,8 +243,6 @@ const Test = () => {
         throw new Error("Network response was not ok");
       }
       // setIsCompleted(true);
-      setProctoringActive(false); // Disable listeners
-      removeListeners(); // Explicitly remove listeners
       redirectToCompletion();
     } catch (error) {
       console.error("Error marking test as complete:", error);
@@ -343,7 +260,7 @@ const Test = () => {
     }
 
     try {
-      const response = await fetch(`${api}/test/testlog/${testlogId}/`, {
+      const response = await fetch(`/test/testlog/${testlogId}/`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -362,7 +279,7 @@ const Test = () => {
 
   const fetchTestGroup = async () => {
     try {
-      const response = await fetch(`${api}/test/testlog/${testlogId}/`);
+      const response = await fetch(`/test/testlog/${testlogId}/`);
       if (!response.ok) throw new Error("Failed to fetch test data");
       const data = await response.json();
       setTestGroupData(data);
@@ -376,7 +293,7 @@ const Test = () => {
 
   const fetchTest = async () => {
     try {
-      const response = await fetch(`${api}/test/${assessmentType === "u" ? "tests" : "prebuiltassessments"}/${testId}/`);
+      const response = await fetch(`/test/${assessmentType === "u" ? "tests" : "prebuiltassessments"}/${testId}/`);
       if (!response.ok) throw new Error("Failed to fetch test data");
       const data = await response.json();
       // // console.log("data : ", data);
@@ -403,7 +320,7 @@ const Test = () => {
     try {
       const query = `question_id=` + questionIds.map((id) => `${id}`).join(",");
       const response = await fetch(
-        `${api}/test/answers/?candidate_id=${candidateId}&type=${assessmentType === "u" ? "user-owned-assessment" : "prebuilt-assessment"}&job_id=${testGroupData?.job}&test_log_id=${testLogId}&test_id=${testId}`,
+        `/test/answers/?candidate_id=${candidateId}&type=${assessmentType === "u" ? "user-owned-assessment" : "prebuilt-assessment"}&job_id=${testGroupData?.job}&test_log_id=${testLogId}&test_id=${testId}`,
         {
           method: "GET",
           headers: {

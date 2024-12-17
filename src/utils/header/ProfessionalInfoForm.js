@@ -2,37 +2,15 @@ import React from 'react'
 
 function ProfessionalInfoForm({
     PhotoIcon,
+    selectedFile,
     handleFileChange,
     fileInputRef,
     preference,
     handleInputChange,
-    userFormData,
-    formValidationResponse
+    userFormData
 }) {
     return (
         <>
-        {formValidationResponse &&
-                Object.keys(formValidationResponse)[0] === "error" && (
-                    <div
-                        className="flex flex-grow items-center p-4 m-3 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50"
-                        role="alert"
-                    >
-                        <svg
-                            className="flex-shrink-0 inline w-4 h-4 me-3"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                        >
-                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-                        </svg>
-                        <span className="sr-only">Info</span>
-                        <div>
-                            {formValidationResponse[Object.keys(formValidationResponse)[0]]}
-                        </div>
-                    </div>
-                )}
-            <div className="px-0 md:px-4 grid grid-cols-1 md:grid-cols-2 gap-4 gap-y-4">
 
             {preference && (
                 <div className="col-span-full py-5">
@@ -302,42 +280,9 @@ function ProfessionalInfoForm({
                                 </div>
                             </div>
                         )}
-
-                        {preference && preference.include_personal_website && (
-                            <div className="md:col-span-1">
-                                <label
-                                    htmlFor="about"
-                                    className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                    Personal Website <span className="text-red-500">*</span>
-                                </label>
-
-                                {/* for mobile version  */}
-                                <div class="relative mt-2 rounded-md shadow-sm ">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-3 border-r">
-                                        <i class="fa-solid fa-globe"></i>
-                                    </div>
-                                    <div class="  items-center ">
-                                        <input
-                                            id="personal_website"
-                                            name="personal_website"
-                                            type="text"
-                                            required
-                                            onChange={(e) =>
-                                                handleInputChange(e.target.name, e.target.value)
-                                            }
-                                            value={userFormData.personal_website}
-                                            className="w-full bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ps-12 p-2.5"
-                                            placeholder="www.alex.com/portfolio/"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             )}
-            </div>
         </>
     )
 }

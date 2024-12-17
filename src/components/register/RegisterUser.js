@@ -3,7 +3,6 @@ import HeroBanner from "./../../assets/hr-banner3.jpg";
 // import "./Register.css"
 import { Tooltip } from "react-tooltip";
 import { useState } from 'react';
-import { api } from '../../constants/constants';
 
 const RegisterUser = () => {
     const history = useNavigate()
@@ -32,7 +31,7 @@ const RegisterUser = () => {
         console.log("formData : ", formData)
         try {
             setErrors(null)
-            const response = await fetch(`${api}/accounts/register/`, {
+            const response = await fetch('/accounts/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

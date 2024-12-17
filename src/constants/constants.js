@@ -5,7 +5,7 @@ export const currentDate = new Date()
 
 export const logFeature = async (orgId, featureId) => {
     try {
-        const response = await fetch(`${api}/business_models/use-feature/${orgId}/${featureId}/`, {
+        const response = await fetch(`/business_models/use-feature/${orgId}/${featureId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -106,6 +106,4 @@ export const selectTheme = (theme) => ({
         primary50: '#7474f3', // Medium shade on option selection
     },
 });
-
-export const api = process.env.REACT_APP_API_URL
 

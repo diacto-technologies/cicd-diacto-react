@@ -2,8 +2,6 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import AuthContext from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import Table from "../../utils/tables/Table";
-import DefaultUserImage from "../../assets/default_avatar.png"
-import { api } from "../../constants/constants";
 
 const Applicants = () => {
   const { user, authTokens, logoutUser, domain } = useContext(AuthContext);
@@ -22,7 +20,6 @@ const Applicants = () => {
   const [tableInstance, setTableInstance] = useState(null);
   const [totalCount, setTotalCount] = useState(null);
   const [tableRowCount, setTableRowCount] = useState("fetching");
-  const [url,setUrl] = useState(`${api}/filter/candidate?o=-latest_resume_created_at`)
 
   const fieldMapping = {
     name: "name", // Example: AG Grid field 'name' maps to backend 'name'
@@ -30,7 +27,7 @@ const Applicants = () => {
     total_duration: "resumes__total_duration",
     "city": "candidate_city",
     "state": "candidate_state",
-    created_at: "latest_resume_created_at",
+    created_at: "resumes__created_at",
     "experience": "resumes__relevant_experience_in_months",
     "job_name": "applied_jobs__title"
     // Add more mappings as needed...
@@ -59,12 +56,6 @@ const Applicants = () => {
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
       headerFilter: true,
       headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
     },
     // {
     //     title: 'Score', field: 'score', hozAlign: "left",vertAlign: "middle",sorter:scoreSorter,
@@ -98,12 +89,6 @@ const Applicants = () => {
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
       headerFilter: true,
       headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
     },
     {
       title: "Contact",
@@ -125,12 +110,6 @@ const Applicants = () => {
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
       headerFilter: true,
       headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
     },
     {
       title: 'City', field: 'city', hozAlign: "left", minWidth: 120, headerSort: false,
@@ -143,13 +122,7 @@ const Applicants = () => {
       // headerPopup: headerPopupFormatter,
       formatter: cityFormatter,
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: true, headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
+      headerFilter: true, headerFilterFunc: "like"
     },
     {
       title: 'State', field: 'state', hozAlign: "left", minWidth: 120, headerSort: false,
@@ -162,13 +135,7 @@ const Applicants = () => {
       // headerPopup: headerPopupFormatter,
       formatter: stateFormatter,
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`, 
-      headerFilter: true, headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
+      headerFilter: true, headerFilterFunc: "like"
     },
     {
       title: "Experience ",
@@ -189,41 +156,29 @@ const Applicants = () => {
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
       headerFilter: true,
       headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
     },
-    // {
-    //   title: "Top Skills",
-    //   field: "skills",
-    //   hozAlign: "left",
-    //   vertAlign: "middle",
-    //   sorter: "array",
-    //   minWidth: 150,
-    //   headerSort: false,
-    //   titleFormatter: function (cell, formatterParams, onRendered) {
-    //     return (
-    //       '<div class="column-container">' +
-    //       `<label class="column-title">${cell.getValue()}</label>` +
-    //       "</div>"
-    //     );
-    //   },
-    //   // headerPopup: headerPopupFormatter,
-    //   formatter: skillsFormatter,
-    //   // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
-    //   headerFilter: true,
-    //   // headerFilterFunc: skillsFilterFunction,
-    //   headerFilterFunc: "like",
-    //   headerFilterParams: {
-    //     elementAttributes: {
-    //       class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-    //       placeholder: "", // Add a placeholder
-    //     },
-    //   },
-    // },
+    {
+      title: "Top Skills",
+      field: "skills",
+      hozAlign: "left",
+      vertAlign: "middle",
+      sorter: "array",
+      minWidth: 150,
+      headerSort: false,
+      titleFormatter: function (cell, formatterParams, onRendered) {
+        return (
+          '<div class="column-container">' +
+          `<label class="column-title">${cell.getValue()}</label>` +
+          "</div>"
+        );
+      },
+      // headerPopup: headerPopupFormatter,
+      formatter: skillsFormatter,
+      // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
+      headerFilter: true,
+      // headerFilterFunc: skillsFilterFunction,
+      headerFilterFunc: "like",
+    },
     {
       title: "Applied For",
       field: "job_name",
@@ -244,16 +199,10 @@ const Applicants = () => {
       // headerPopupIcon: `<i class='fa-solid fa-filter column-filter-icon' title='Filter'></i>`,
       headerFilter: true,
       headerFilterFunc: "like",
-      headerFilterParams: {
-        elementAttributes: {
-          class: "w-full rounded-lg border border-gray-300 p-2 my-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500", // Tailwind classes for styling
-          placeholder: "", // Add a placeholder
-        },
-      },
     },
     {
       title: "Applied On",
-      field: "created_at",
+      field: "updated_at",
       hozAlign: "left",
       vertAlign: "middle",
       minWidth: 120,
@@ -269,7 +218,7 @@ const Applicants = () => {
         let datePickerHTML = `
             <div class="column-container">
                 <label class="column-title">${cell.getColumn().getDefinition().title}</label>
-                <input type="date" id="date-picker" class="date-picker border w-full p-1 rounded-md my-1" style="width: -webkit-fill-available;">
+                <input type="date" id="date-picker" class="date-picker" style="width: -webkit-fill-available;">
             </div>
         `;
 
@@ -283,9 +232,9 @@ const Applicants = () => {
               // Trigger your custom action here
               // Example: Filter the table by the selected date
               if (selectedDate) {
-                cell.getTable().setFilter("created_at", "in", selectedDate);
+                cell.getTable().setFilter("updated_at", "in", selectedDate);
               } else {
-                cell.getTable().clearFilter("created_at"); // Clear the filter if no date is selected
+                cell.getTable().clearFilter("updated_at"); // Clear the filter if no date is selected
               }
             });
           }
@@ -293,7 +242,7 @@ const Applicants = () => {
 
         return datePickerHTML;
       },
-      formatter: createdAtFormatter,
+      formatter: luxonDateDiffFormatter,
       headerFilter: emptyHeaderFilter,
       
     },
@@ -403,23 +352,16 @@ const Applicants = () => {
     return container;
   }
 
-  // function luxonDateDiffFormatter(cell, formatterParams, onRendered) {
-  //   // const { inputFormat, units, humanize, invalidPlaceholder } = formatterParams;
-  //   const value = new Date(cell.getValue()).toDateString();
-  //   return value;
-  // }
+  function luxonDateDiffFormatter(cell, formatterParams, onRendered) {
+    // const { inputFormat, units, humanize, invalidPlaceholder } = formatterParams;
+    const value = new Date(cell.getValue()).toDateString();
+    return value;
+  }
 
   function jobNameFormatter(cell, formatterParams, onRendered) {
     const job = cell.getRow().getData().applied_jobs;
     // console.log(cell.getRow().getData())
     return job.length > 0 ? job[0].title : "";
-  }
-
-  function createdAtFormatter(cell, formatterParams, onRendered) {
-    // const { inputFormat, units, humanize, invalidPlaceholder } = formatterParams;
-    const updated_at = cell.getRow().getData()?.resumes[0]?.created_at || null
-    const value = updated_at ?  new Date(updated_at).toDateString() : "";
-    return value;
   }
 
   // function (p) => {
@@ -489,20 +431,11 @@ const Applicants = () => {
   }
 
   function linkFormatter(cell, formatterParams, onRendered) {
-    const data = cell.getRow().getData(); // Fetch the row data
-    const profilePic = data.profile_pic || DefaultUserImage; // Default placeholder
-    const name = cell.getValue(); // Get the cell value (candidate name)
-
-    return `
-        <div class="flex items-center gap-3 w-full">
-            <div class="w-8 min-w-8 h-8 rounded-full overflow-hidden border border-gray-300">
-                <img src="${profilePic}" alt="${name}" class="object-cover w-full h-full" />
-            </div>
-            <span class="text-gray-800 font-medium">${name}</span>
-            <i class="fa-solid fa-up-right-from-square text-blue-500"></i>
-        </div>
-    `;
-}
+    <i class="fa-solid fa-up-right-from-square"></i>;
+    return `<div class="">
+                <span class="me-2 text-sky-800 font-semibold">${cell.getValue()}</span>
+            </div>`;
+  }
 
   function emptyHeaderFilter(cell, formatterParams, onRendered) {
     return document.createElement("div");
@@ -652,13 +585,19 @@ const Applicants = () => {
                 </div> */}
 
         <div
-          className="overflow-auto rounded-xl border"
+          className="overflow-auto rounded-xl  "
           style={{ height: "calc(100dvh - 130px)" }}
         >
           {/* {
                             filteredApplicants.length > 0 ? */}
-          <Table url={`/filter/candidate?o=-latest_resume_created_at`} setTableInstance={setTableInstance} setTableRowCount={setTableRowCount} columns={columns} data={filteredApplicants} fieldMapping={fieldMapping} />
-          
+          <Table url={`/filter/candidate`} setTableInstance={setTableInstance} setTableRowCount={setTableRowCount} columns={columns} data={filteredApplicants} fieldMapping={fieldMapping} />
+          {/* <AGGridTable
+            fieldMapping={fieldMapping}
+            url={`/filter/candidate`}
+            setTotalCount={setTotalCount}
+            columnDefs={columnDefs}
+            setTableInstance={setTableInstance}
+          /> */}
         </div>
       </div>
       {/* } */}

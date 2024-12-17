@@ -11,55 +11,36 @@ function ScoreWeights({ weights, setWeights ,error}) {
   useEffect(() => {
     const options = {
       tooltip: {
-        trigger: "item",
+        trigger: 'item'
       },
       legend: {
         show: false,
-        top: "5%",
-        left: "center",
+        top: '5%',
+        left: 'center'
       },
+      
       series: [
         {
-          name: "Metric",
-          type: "pie",
-          radius: ["40%", "70%"],
-          center: ["50%", "70%"],
+          name: 'Metric',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          center: ['50%', '70%'],
+          
+          // adjust the start and end angle
           startAngle: 180,
           endAngle: 360,
           data: [
-            {
-              value: weights.skills,
-              name: "Skills",
-              itemStyle: { color: "#b294e7" }, // Light Blue
-            },
-            {
-              value: weights.work_experience,
-              name: "Work Experience",
-              itemStyle: { color: "#777ff3" }, // Dark Blue
-            },
-            {
-              value: weights.projects,
-              name: "Projects",
-              itemStyle: { color: "#8db0f5" }, // Light Pink
-            },
-            {
-              value: weights.education,
-              name: "Education",
-              itemStyle: { color: "#abe9fb" }, // Deep Navy
-            },
-            {
-              value: weights.certifications,
-              name: "Certification",
-              itemStyle: { color: "#94c4fb" }, // Reuse Light Blue
-            },
-          ],
-        },
-      ],
+            { value: weights.skills, name: "Skills" },
+            { value: weights.work_experience, name: 'Work Experience' },
+            { value: weights.projects, name: 'Projects' },
+            { value: weights.education, name: 'Education' },
+            { value: weights.certifications, name: 'Certification' }
+          ]
+        }
+      ]
     };
-    
-    setWeightOptions(options);
-    
-    
+
+    setWeightOptions(options)
   }, [weights])
 
   // Configuration options for the bar chart

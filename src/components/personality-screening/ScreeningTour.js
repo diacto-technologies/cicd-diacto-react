@@ -9,8 +9,6 @@ import CountdownTimer from "./CountdownTimer";
 import StartTimer from "./StartTimer";
 import Axel from "../../assets/axel.jpg";
 import SpinLoader from "../../utils/loaders/SpinLoader";
-import VoiceAnimation from "./VoiceAnimation";
-import { api } from "../../constants/constants";
 const ScreeningTour = () => {
   const { candidateId, screeningId } = useParams();
   const [showStructure, setShowStructure] = useState(false);
@@ -37,9 +35,9 @@ const ScreeningTour = () => {
   const [questions, setQuestions] = useState([
     {
       id: 4,
-      text: "Introduce yourself in 90 seconds?",
+      text: "How much is 1 + 1?",
       type: "text",
-      time_limit: 10,
+      time_limit: 5,
       created_at: "2024-03-18T13:30:07.610592Z",
       question_set: 2,
       created_by: 1,
@@ -48,7 +46,7 @@ const ScreeningTour = () => {
       id: 5,
       text: "How was your day?",
       type: "text",
-      time_limit: 10,
+      time_limit: 5,
       created_at: "2024-03-18T13:31:52.184905Z",
       question_set: 2,
       created_by: 1,
@@ -57,7 +55,7 @@ const ScreeningTour = () => {
       id: 8,
       text: "Talk about pizza for 30 seconds.",
       type: "video",
-      time_limit: 10,
+      time_limit: 5,
       created_at: "2024-04-08T09:19:51.370981Z",
       question_set: 2,
       created_by: 1,
@@ -79,6 +77,7 @@ const ScreeningTour = () => {
   const [submittingAnswer, setSubmittingAnswer] = useState(false);
 
   const navigate = useNavigate();
+  console.count("<<< Screening Tour >>>");
   let estimatedTime = 30;
 
   useEffect(() => {
@@ -225,12 +224,12 @@ const ScreeningTour = () => {
 
       try {
         const [candidateResponse, screeningResponse] = await Promise.all([
-          fetch(`${api}/candidates/candidate-details/${candidateId}/`, {
+          fetch(`/candidates/candidate-details/${candidateId}/`, {
             method: "GET",
             headers: headers,
           }),
           fetch(
-            `${api}/personality-screening/personality-screenings/${screeningId}/`,
+            `/personality-screening/personality-screenings/${screeningId}/`,
             {
               method: "GET",
               headers: headers,
@@ -281,6 +280,7 @@ const ScreeningTour = () => {
       await startRecording();
       setCurrentQuestionIndex(0);
       setCurrentQuestion(questions[0]);
+     
     } catch (error) {
       console.log(error);
     }
@@ -297,6 +297,7 @@ const ScreeningTour = () => {
       setCurrentQuestion(questions[currentQuestionIndex + 1]); // Set the next question
     } else {
       // Handle the case when there are no more questions (end of questionnaire)
+
     }
   };
 
@@ -349,7 +350,7 @@ const ScreeningTour = () => {
         service: "Personality Screening",
       };
 
-      // const response = await fetch(`${api}/interview/update-step/`, {
+      // const response = await fetch(`/interview/update-step/`, {
       //     method: 'POST',
       //     headers: {
       //         "Content-Type": "application/json",
@@ -372,9 +373,10 @@ const ScreeningTour = () => {
       // Authorization: "Bearer " + String(authTokens.access),
     };
 
+
     try {
       const screeningResponse = await fetch(
-        `${api}/personality-screening/personality-screenings/${screeningId}/`,
+        `/personality-screening/personality-screenings/${screeningId}/`,
         {
           method: "PATCH",
           headers: headers,
@@ -384,6 +386,7 @@ const ScreeningTour = () => {
 
       if (!screeningResponse.ok) {
         if (screeningResponse.status === 404) {
+
           navigate("/page-not-found/");
         } else {
           throw new Error("One or more network responses were not ok");
@@ -407,6 +410,7 @@ const ScreeningTour = () => {
   };
 
   // console.log(currentQuestionIndex, questions?.length, askedQuestions?.length, screeningDetails)
+ 
 
   return (
     <>
@@ -460,6 +464,7 @@ const ScreeningTour = () => {
                         </p>
                       )}
                     </div>
+                   
                   </div>
                 </div>
               ) : (
@@ -486,16 +491,9 @@ const ScreeningTour = () => {
                           }}
                         >
                           {!startTimer && (
-                            <div className="flex gap-3 flex-col items-center justify-center">
-                              <label className="text-2xl font-semibold text-gray-900">
-                                Click "Start" to begin your screening.
-                              </label>
-                              <p className="text-blue-700 mt-2">
-                                Note: This is a practice screening session, and
-                                your responses will not be shared with the
-                                recruiter.
-                              </p>
-                            </div>
+                            <label className="text-2xl font-semibold text-gray-900">
+                              Click on "Start" to begin your screening
+                            </label>
                           )}
                           <StartTimer
                             onComplete={startScreening}
@@ -585,11 +583,13 @@ const ScreeningTour = () => {
                                   </span>
                                   {/* <span className="text-sm text-gray-600 inline-flex space-x-3">11:15pm </span> */}
                                   <span>
-                                    <TextToSpeech
+                                    
+                                      <TextToSpeech
                                       isSpeaking={isSpeaking}
                                       setIsSpeaking={setIsSpeaking}
                                       text={currentQuestion?.text}
                                     />
+                                 
                                   </span>
                                 </div>
                                 <label className=" text-base block font-bold  text-gray-800">
@@ -655,21 +655,12 @@ const ScreeningTour = () => {
                         </div>
 
                         <div className=" rounded-lg pe-4">
-                          {isSpeaking ? (
-                            <div className="w-32 h-32 bg-gray-200 rounded-full shadow-xl ring-4 overflow-hidden flex items-center justify-center">
-                              <VoiceAnimation />
-                            </div>
-                          ) : (
-                            <div className="w-32 h-32 bg-gray-200 rounded-full shadow-xl ring-4 overflow-hidden flex items-center justify-center">
-                              <div id="bars" className="">
-                                <div class="bar2"></div>
-                                <div class="bar2"></div>
-                                <div class="bar2"></div>
-                                <div class="bar2"></div>
-                                {/* <div class="bar"></div> */}
-                              </div>
-                            </div>
-                          )}
+                          <img
+                            ref={imageRef}
+                            className=" w-32 h-32 rounded-full shadow-xl ring-4"
+                            src={Axel}
+                            alt="Image"
+                          />
                         </div>
                       </div>
                     </div>
@@ -708,7 +699,7 @@ const ScreeningTour = () => {
                                 audioURL={audioAnswers[question.id]}
                                 submitted={submittedAnswers[question.id]}
                               />
-                            </Fragment>
+                            </Fragment>  
                           ))}
                       </ul>
                     </div>

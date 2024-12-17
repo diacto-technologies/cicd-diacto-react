@@ -1,6 +1,5 @@
 import { useContext, useState } from "react";
 import AuthContext from "../../context/AuthContext";
-import { api } from "../constants";
 
 
 export const useFetchJobs = () => {
@@ -12,9 +11,9 @@ export const useFetchJobs = () => {
     try {
         setLoadingJobs(true)
         const endpoint = title
-                ? `${api}/jobs/job-names-list/?title=${title}`
-                : `${api}/jobs/job-names-list/`;
-      const response = await fetch(`${endpoint}`, {
+                ? `/jobs/job-names-list/?title=${title}`
+                : `/jobs/job-names-list/`;
+      const response = await fetch(`/jobs/job-names-list/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
