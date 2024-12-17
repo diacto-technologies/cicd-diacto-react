@@ -1,0 +1,38 @@
+.audio-player {
+    width: 100%;
+    max-width: 400px;
+    background-color: transparent;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+ 
+  
+  .progress-bar {
+    flex-grow: 1;
+    height: 8px;
+    background-color: #dcd8e7;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  
+  .progress-bar-filled {
+    height: 100%;
+    background-color: #9a85e7;
+    width: 0%;
+    transition: width 0.1s ease-in-out;
+  }
+  
+  .time {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  

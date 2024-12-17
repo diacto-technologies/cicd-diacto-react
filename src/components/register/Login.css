@@ -1,0 +1,118 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+body{
+    font-family: 'Hanken Grotesk', sans-serif !important;
+}
+
+
+
+
+.error{
+    font-size: .69rem !important;
+    color: #e63946 !important;
+    font-family: 'Hanken Grotesk', sans-serif !important;
+}
+
+.custom-container{
+    border-radius: 30px;
+}
+
+.login-content {
+    border-radius: 30px;
+    width: 85%;
+    /* background-color: #2a2a2a; */
+    background: rgb(18, 17, 17);
+    /* background: linear-gradient(137deg, rgb(52, 50, 50) 0%, rgb(18, 17, 17) 100%); */
+    /* background-color: #b1eaf4!important; */
+    /* background-color: #95d0f1!important; */
+    /* box-shadow: 3px 3px 20px -10px rgba(225, 215, 161, 0.272); */
+}
+
+.brand{
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.2rem;
+}
+
+.video{
+    width: 100vw;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    font-weight: normal;
+    overflow: hidden;
+    top: 0;
+    object-fit: cover;
+}
+
+.title{
+    font-family: 'Open Sans', sans-serif;
+    
+};
+.slogan{
+    font-family: 'Open Sans', sans-serif !important; 
+}
+
+.test{
+    color: #b9a872 !important;
+}
+
+.login-form label{
+    font-size: .65rem;
+    color: #e3e2e2;
+}
+
+.login-form .input-text{
+    font-size: .7rem !important;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.login-form .input-text:focus {
+    background-color: #f0f0f0;
+}
+
+.login-button button{
+    border-radius: 10px;
+    font-size: .7rem;
+    font-weight: 700;
+    padding: 8px !important;
+    border: 0;
+    color: white;
+    background-color: #af9c58;
+}
+
+.login-button button:hover{
+    background-color: #dac274;
+    color: white;
+}
+
+input[type='password'] {
+    font-family: Verdana;
+}
+
+.terms-of-service{
+    font-size: .6rem;
+    color: #d3d2d2;
+}
+
+.left-adjustment {
+    float: left;
+}
+
+.card-img-overlay{
+   
+    background: rgb(206, 206, 206);
+    background: linear-gradient(86deg, rgba(78, 78, 78, 0.203) 0%, rgba(45, 45, 45, 0.589) 100%);
+}
+
+.logo_mp4{
+    width: 300px;
+    height: 100px;
+    /* background-color: #af9c58; */
+}
