@@ -2,7 +2,6 @@
 
 #_Change_Working_Directory
 cd /home/ubuntu/ditacto
-chmod +x /home/ubuntu/ditacto/scripts/after_install.sh
 
 
 #_Remove_Unused_Code

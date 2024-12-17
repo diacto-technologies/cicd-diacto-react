@@ -9,7 +9,6 @@ phases:
         # install npm
         - npm install
         - npm install --save-dev @babel/plugin-proposal-private-property-in-object
-        
        
   build:
     commands:
@@ -23,6 +22,6 @@ artifacts:
     - public/**/*
     - src/**/*
     - package.json
-    - login-test.js
+    - server.js
     - appspec.yml
     - scripts/**/*
