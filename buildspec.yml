@@ -3,19 +3,33 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 20  # Ensure Node.js v20.x.x is used
+      nodejs: 16  # Default Node.js version for CodeBuild (can be any version, will be replaced by nvm later)
     commands:
-      - echo Installing dependencies...
-      - npm install
+      - echo Installing NVM (Node Version Manager)
+      - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash  # Install nvm
+      - source ~/.bashrc  # Ensure nvm is sourced correctly
+      - echo Installing Node.js v20.17.0 using nvm...
+      - nvm install 20.17.0  # Install Node.js 20.17.0
+      - nvm use 20.17.0  # Use Node.js 20.17.0
+      - node -v  # Verify Node.js version
+      - npm install -g npm@10  # Ensure npm is the correct version
+      - echo Installing project dependencies...
+      - npm install  # Install dependencies from package.json
+
   build:
     commands:
       - echo Building the React app...
-      - npm run build
+      - npm run build  # Build the React app (ensure `build` is defined in package.json)
+
   post_build:
     commands:
       - echo Packaging build artifacts...
-      - mkdir -p build-artifacts
-      - cp -r build/* build-artifacts/
+      - mkdir -p build-artifacts  # Create a directory to store the build output
+      - cp -r build/* build-artifacts/  # Copy build files to the artifacts directory
+      - echo Build artifacts prepared successfully
+
 artifacts:
   files:
+    - build-artifacts/**/*  # Specify the files to be uploaded as build artifacts
+
     - build-artifacts/**/*
