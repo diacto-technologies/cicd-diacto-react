@@ -10,7 +10,7 @@ phases:
       # Optional: Add a delay to ensure cache clean completes
       - sleep 10
       # Update npm to the latest stable version
-      - npm install -g npm@latest
+      - npm install -f
       # Install dependencies with verbose logging for debugging
       - npm install --verbose
 
