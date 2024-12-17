@@ -4,34 +4,24 @@ phases:
   install:
     runtime-versions:
       nodejs: 20
+   
     commands:
-      # Display Node.js and npm versions
-      - node -v
-      - npm -v
-
-      # Clear npm cache to prevent corrupt tarball issues
-      - npm cache clean --force
-
-      # Remove existing dependencies to ensure a clean slate
-      - rm -rf node_modules package-lock.json
-
-      # Set npm registry explicitly
-      - npm set registry https://registry.npmjs.org/
-
-      # Install dependencies with verbose logging
-      - npm install --verbose
-
+        # install npm
+        - npm install
+        - npm install --save-dev @babel/plugin-proposal-private-property-in-object
+       
   build:
     commands:
-      # Run the build script
-      - npm run build
-
+        # run build script
+        - npm run-script build
+     
 artifacts:
+  # include all files required to run application
+  # notably excluded is node_modules, as this will cause overwrite error on deploy
   files:
     - public/**/*
-    - dist/**/*
+    - src/**/*
     - package.json
-    - package-lock.json
-    - index.js
+    - server.js
     - appspec.yml
     - scripts/**/*
