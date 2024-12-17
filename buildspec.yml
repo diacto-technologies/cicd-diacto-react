@@ -3,18 +3,19 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 20
+      nodejs: 20  # Ensure Node.js v20.x.x is used
     commands:
-      - echo Installing dependencies
-      - npm install -g npm
+      - echo Installing dependencies...
+      - npm install
   build:
     commands:
-      - echo Building the React app
+      - echo Building the React app...
       - npm run build
   post_build:
     commands:
-      - echo Preparing for deployment
-      - zip -r react-app.zip build appspec.yml scripts/
+      - echo Packaging build artifacts...
+      - mkdir -p build-artifacts
+      - cp -r build/* build-artifacts/
 artifacts:
   files:
-    - react-app.zip
+    - build-artifacts/**/*
