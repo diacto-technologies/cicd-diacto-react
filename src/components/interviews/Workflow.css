@@ -1,9 +1,0 @@
-.workflow-container{
-    width: 100%;
-  height: 100%;
-  /* Add your background pattern here */
-  background-color: #ebebeb;
-  background-image: radial-gradient(rgba(126, 126, 126, 0.171) 2px, transparent 0);
-  background-size: 30px 30px;
-  background-position: -5px -5px
-}

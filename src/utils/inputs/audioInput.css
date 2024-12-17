@@ -1,4 +1,0 @@
-.audio-player {
-    width: -webkit-fill-available; /* For WebKit-based browsers */
-    width: fill-available; /* For standard */
-  }
