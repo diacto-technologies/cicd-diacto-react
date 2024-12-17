@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 16  # Default Node.js version for CodeBuild (can be any version, will be replaced by nvm later)
+      nodejs: 20  # Default Node.js version for CodeBuild (can be any version, will be replaced by nvm later)
     commands:
       - echo Installing NVM (Node Version Manager)
       - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash  # Install nvm
